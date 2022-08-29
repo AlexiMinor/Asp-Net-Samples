@@ -4,3 +4,7 @@ AspNetSample/.vs/
 AspNetSample/AspNetSampleMvcApp/bin/
 
 AspNetSample/AspNetSampleMvcApp/obj/
+/AspNetSample/AspNetSample.Business/bin/Debug/net6.0
+/AspNetSample/AspNetSample.Business/obj
+/AspNetSample/AspNetSample.Core/bin/Debug/net6.0
+/AspNetSample/AspNetSample.Core/obj

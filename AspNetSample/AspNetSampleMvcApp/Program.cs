@@ -1,3 +1,7 @@
+using AspNetSample.Business.ServicesImplementations;
+using AspNetSample.Core;
+using AspNetSample.Core.Abstractions;
+
 namespace AspNetSampleMvcApp
 {
     public class Program
@@ -8,6 +12,10 @@ namespace AspNetSampleMvcApp
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            //builder.Services.AddTransient<IArticleService, ArticleService>();
+            builder.Services.AddScoped<IArticleService, ArticleService>();
+            builder.Services.AddSingleton<ArticlesStorage>();
 
             var app = builder.Build();
 
