@@ -1,6 +1,7 @@
 ﻿using AspNetSample.Business.ServicesImplementations;
 using AspNetSample.Core;
 using AspNetSample.Core.Abstractions;
+using AspNetSample.Core.DataTransferObjects;
 using AspNetSampleMvcApp.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -41,13 +42,22 @@ namespace AspNetSampleMvcApp.Controllers
                 //logger
                 throw;
             }
-
-}
+        }
 
         public async Task<IActionResult> Details(Guid id)
         {
-            //get concrete article
-            return Ok();
+            var dto = await _articleService.GetArticleByIdAsync(id);
+            if (dto != null)
+            {
+                //ViewData["model"] = dto;
+                //ViewBag.Model = dto;
+                
+                return View(dto);
+            }
+            else
+            {
+                return NotFound();
+            }
         }
         
         [HttpGet]

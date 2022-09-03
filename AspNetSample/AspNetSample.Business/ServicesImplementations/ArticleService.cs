@@ -37,4 +37,12 @@ public class ArticleService : IArticleService
         var list = new List<ArticleDto>();
         return list;
     }
+
+    public async Task<ArticleDto> GetArticleByIdAsync(Guid id)
+    {
+        var dto = _articlesStorage.ArticlesList
+            .FirstOrDefault(articleDto => articleDto.Id.Equals(id));
+
+        return dto;
+    }
 }
