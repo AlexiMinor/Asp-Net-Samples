@@ -1,34 +1,33 @@
-﻿using AspNetSample.Core;
+﻿using AspBetSample.DataBase;
 using AspNetSample.Core.Abstractions;
 using AspNetSample.Core.DataTransferObjects;
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace AspNetSample.Business.ServicesImplementations;
 
 public class ArticleService : IArticleService
 {
-    private readonly ArticlesStorage _articlesStorage;
-    public ArticleService(ArticlesStorage articlesStorage)
+    private readonly IMapper _mapper;
+    private readonly GoodNewsAggregatorContext _databaseContext;
+
+    public ArticleService(GoodNewsAggregatorContext databaseContext,
+        IMapper mapper)
     {
-        _articlesStorage = articlesStorage;
+        _databaseContext = databaseContext;
+        _mapper = mapper;
     }
 
-    public async Task<List<ArticleDto>> GetArticlesByPageNumberAndPageSizeAsync(int pageNumber, int pageSize)
+
+    public async Task<List<ArticleDto>> GetArticlesByPageNumberAndPageSizeAsync(int pageNumber,
+        int pageSize)
     {
-        List<ArticleDto> list;
-        //using (var db = new Context)
-        //{
-        //    list = db.Articles.AsNoTracking.Skip(page * _pageSize)
-        //        .Take(_pageSize)
-        //        .Select(art => new ArticleModel()
-        //        {
-        //            some data here
-        //        })
-        //        .ToList();
-        //}
-        list = _articlesStorage.ArticlesList
+        var list = await _databaseContext.Articles
             .Skip(pageNumber * pageSize)
             .Take(pageSize)
-            .ToList();
+            .Select(article => _mapper.Map<ArticleDto>(article))
+            .ToListAsync();
+
         return list;
     }
 
@@ -40,8 +39,9 @@ public class ArticleService : IArticleService
 
     public async Task<ArticleDto> GetArticleByIdAsync(Guid id)
     {
-        var dto = _articlesStorage.ArticlesList
-            .FirstOrDefault(articleDto => articleDto.Id.Equals(id));
+        var dto = new ArticleDto();
+        //_articlesStorage.ArticlesList
+        //.FirstOrDefault(articleDto => articleDto.Id.Equals(id));
 
         return dto;
     }

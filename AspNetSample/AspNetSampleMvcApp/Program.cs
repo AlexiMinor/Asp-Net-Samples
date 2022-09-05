@@ -1,6 +1,8 @@
+using AspBetSample.DataBase;
 using AspNetSample.Business.ServicesImplementations;
 using AspNetSample.Core;
 using AspNetSample.Core.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
 namespace AspNetSampleMvcApp
 {
@@ -13,9 +15,14 @@ namespace AspNetSampleMvcApp
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-            //builder.Services.AddTransient<IArticleService, ArticleService>();
+            var connectionString = "Server=DESKTOP-11O0AN1\\SQLSERVER2019;Database=GoodNewsAggregatorDataBase;Trusted_Connection=True;";
+            
+            builder.Services.AddDbContext<GoodNewsAggregatorContext>(
+                optionsBuilder => optionsBuilder.UseSqlServer(connectionString));
+
+            builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
             builder.Services.AddScoped<IArticleService, ArticleService>();
-            builder.Services.AddSingleton<ArticlesStorage>();
 
             var app = builder.Build();
 
