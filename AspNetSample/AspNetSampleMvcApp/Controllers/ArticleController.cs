@@ -4,6 +4,8 @@ using AspNetSample.Core.Abstractions;
 using AspNetSample.Core.DataTransferObjects;
 using AspNetSampleMvcApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
+using Serilog.Events;
 
 namespace AspNetSampleMvcApp.Controllers
 {
@@ -11,7 +13,7 @@ namespace AspNetSampleMvcApp.Controllers
     {
 
         private readonly IArticleService _articleService;
-
+        
         private int _pageSize = 5;
 
         public ArticleController(IArticleService articleService)
@@ -34,13 +36,13 @@ namespace AspNetSampleMvcApp.Controllers
                 }
                 else
                 {
-                    return View("NoArticles");
+                    throw new ArgumentException(nameof(page));
                 }
             }
             catch (Exception e)
             {
-                //logger
-                throw;
+               Log.Error($"{e.Message}. {Environment.NewLine} {e.StackTrace}");
+               return BadRequest();
             }
         }
 

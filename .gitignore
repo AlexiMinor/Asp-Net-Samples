@@ -8,3 +8,11 @@ AspNetSample/AspNetSampleMvcApp/obj/
 /AspNetSample/AspNetSample.Business/obj
 /AspNetSample/AspNetSample.Core/bin/Debug/net6.0
 /AspNetSample/AspNetSample.Core/obj
+
+AspNetSample/AspBetSample.DataBase/bin/
+
+AspNetSample/AspBetSample.DataBase/obj/
+
+AspNetSample/AspNetSample.Business/bin/
+
+AspNetSample/AspNetSample.Core/bin/
