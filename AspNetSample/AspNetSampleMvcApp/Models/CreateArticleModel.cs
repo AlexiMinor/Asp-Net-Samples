@@ -1,6 +1,8 @@
-﻿namespace AspNetSampleMvcApp.Models;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 
-public class ArticleModel
+namespace AspNetSampleMvcApp.Models;
+
+public class CreateArticleModel
 {
     public Guid Id { get; set; }
     public string Title { get; set; }
@@ -12,4 +14,6 @@ public class ArticleModel
     public string Text { get; set; }
 
     public DateTime PublicationDate { get; set; }
+
+    public List<SelectListItem> Sources { get; set; }
 }

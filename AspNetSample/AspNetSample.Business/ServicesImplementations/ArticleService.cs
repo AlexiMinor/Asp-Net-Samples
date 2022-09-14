@@ -1,4 +1,5 @@
 ﻿using AspBetSample.DataBase;
+using AspBetSample.DataBase.Entities;
 using AspNetSample.Core.Abstractions;
 using AspNetSample.Core.DataTransferObjects;
 using AutoMapper;
@@ -55,10 +56,25 @@ public class ArticleService : IArticleService
 
     public async Task<ArticleDto> GetArticleByIdAsync(Guid id)
     {
-        var dto = new ArticleDto();
-        //_articlesStorage.ArticlesList
-        //.FirstOrDefault(articleDto => articleDto.Id.Equals(id));
+        var entity =  await _databaseContext.Articles.FirstOrDefaultAsync(article => article.Id.Equals(id));
+        var dto = _mapper.Map<ArticleDto>(entity);
 
         return dto;
+    }
+
+    public async Task<int> CreateArticleAsync(ArticleDto dto)
+    {
+        var entity = _mapper.Map<Article>(dto);
+
+        if (entity!= null)
+        {
+            await _databaseContext.Articles.AddAsync(entity);
+            var addingResult = await _databaseContext.SaveChangesAsync();
+            return addingResult;
+        }
+        else
+        {
+            throw new ArgumentException(nameof(dto));
+        }
     }
 }

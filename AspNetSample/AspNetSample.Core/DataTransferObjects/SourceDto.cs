@@ -1,13 +1,9 @@
-﻿using AspNetSample.Core;
+﻿namespace AspNetSample.Core.DataTransferObjects;
 
-namespace AspBetSample.DataBase.Entities;
-
-public class Source 
+public class SourceDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
     public string Url { get; set; }
     public SourceType SourceType { get; set; }
-
-    public List<Article> Articles { get; set; }
 }

@@ -39,6 +39,7 @@ namespace AspNetSampleMvcApp
             builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             builder.Services.AddScoped<IArticleService, ArticleService>();
+            builder.Services.AddScoped<ISourceService, SourceService>();
 
             builder.Configuration.AddJsonFile("secrets.json");
             //builder.Configuration.AddTextFile("somepath");

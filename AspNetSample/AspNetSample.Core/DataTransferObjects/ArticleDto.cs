@@ -1,6 +1,4 @@
-﻿using AspBetSample.DataBase.Entities;
-
-namespace AspNetSample.Core.DataTransferObjects;
+﻿namespace AspNetSample.Core.DataTransferObjects;
 
 public class ArticleDto
 {
@@ -14,14 +12,4 @@ public class ArticleDto
     public string Text { get; set; }
 
     public DateTime PublicationDate { get; set; }
-
-    //public ArticleDto(Article article)
-    //{
-    //    Id = article.Id;
-    //    Title = article.Title;
-    //    Category = "Default";
-    //    Text = article.FullText;
-    //    PublicationDate = article.PublicationDate;
-    //    ShortSummary = article.ShortDescription;
-    //}
 }

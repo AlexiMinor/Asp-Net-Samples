@@ -3,7 +3,9 @@ using AspNetSample.Core;
 using AspNetSample.Core.Abstractions;
 using AspNetSample.Core.DataTransferObjects;
 using AspNetSampleMvcApp.Models;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Serilog;
 using Serilog.Events;
 
@@ -13,12 +15,16 @@ namespace AspNetSampleMvcApp.Controllers
     {
 
         private readonly IArticleService _articleService;
-        
+        private readonly ISourceService _sourceService;
+        private readonly IMapper _mapper;
         private int _pageSize = 5;
 
-        public ArticleController(IArticleService articleService)
+        public ArticleController(IArticleService articleService,
+            IMapper mapper, ISourceService sourceService)
         {
             _articleService = articleService;
+            _mapper = mapper;
+            _sourceService = sourceService;
         }
 
         public async Task<IActionResult> Index(int page)
@@ -41,8 +47,8 @@ namespace AspNetSampleMvcApp.Controllers
             }
             catch (Exception e)
             {
-               Log.Error($"{e.Message}. {Environment.NewLine} {e.StackTrace}");
-               return BadRequest();
+                Log.Error($"{e.Message}. {Environment.NewLine} {e.StackTrace}");
+                return BadRequest();
             }
         }
 
@@ -53,7 +59,7 @@ namespace AspNetSampleMvcApp.Controllers
             {
                 //ViewData["model"] = dto;
                 //ViewBag.Model = dto;
-                
+
                 return View(dto);
             }
             else
@@ -61,18 +67,102 @@ namespace AspNetSampleMvcApp.Controllers
                 return NotFound();
             }
         }
-        
+
         [HttpGet]
-        public async Task<IActionResult> Edit()
+        public async Task<IActionResult> Create()
         {
-            return Ok();
-        }
-        
-        [HttpPost]
-        public async Task<IActionResult> Edit(TestModel model)
-        {
-            return Ok();
+            //var model = new CreateArticleModel();
+            
+            //var sources = await _sourceService.GetSourcesAsync();
+
+            //model.Sources = sources
+            //    .Select(dto => new SelectListItem(
+            //        dto.Name,
+            //        dto.Id.ToString("G")))
+            //    .ToList();
+
+            //return View(model);
+
+            return View();
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Create(ArticleModel model)
+        {
+            try
+            {
+                if (model != null)
+                {
+                    model.Id = Guid.NewGuid();
+                    model.PublicationDate = DateTime.Now;
+
+                    var dto = _mapper.Map<ArticleDto>(model);
+
+                    await _articleService.CreateArticleAsync(dto);
+
+                    return RedirectToAction("Index", "Article");
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, ex.Message);
+                return StatusCode(500);
+            }
+
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(Guid id)
+        {
+            if (id != Guid.Empty)
+            {
+                var articleDto = await _articleService.GetArticleByIdAsync(id);
+                if (articleDto == null)
+                {
+                    return BadRequest();
+                }
+
+                var editModel = _mapper.Map<ArticleModel>(articleDto);
+
+                return View(editModel);
+            }
+
+            return BadRequest();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(ArticleModel model)
+        {
+            try
+            {
+                if (model != null)
+                {
+                    var dto = _mapper.Map<ArticleDto>(model);
+
+                    //await _articleService.CreateArticleAsync(dto);
+
+                    return RedirectToAction("Index", "Article");
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, ex.Message);
+                return StatusCode(500);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            return Ok();
+        }
     }
 }
