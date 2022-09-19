@@ -72,7 +72,7 @@ namespace AspNetSampleMvcApp.Controllers
         public async Task<IActionResult> Create()
         {
             //var model = new CreateArticleModel();
-            
+
             //var sources = await _sourceService.GetSourcesAsync();
 
             //model.Sources = sources
@@ -91,8 +91,14 @@ namespace AspNetSampleMvcApp.Controllers
         {
             try
             {
-                if (model != null)
+                if (ModelState.IsValid)
                 {
+                    if (model.Title.ToUpperInvariant().Contains("123"))
+                    {
+                        ModelState.AddModelError("Title", "Article contains 123");
+                        return View(model);
+                    }
+
                     model.Id = Guid.NewGuid();
                     model.PublicationDate = DateTime.Now;
 
@@ -102,9 +108,10 @@ namespace AspNetSampleMvcApp.Controllers
 
                     return RedirectToAction("Index", "Article");
                 }
+
                 else
                 {
-                    return BadRequest();
+                    return View(model);
                 }
             }
             catch (Exception ex)
