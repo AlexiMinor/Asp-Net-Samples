@@ -26,13 +26,13 @@
 
   <ItemGroup>
     <Folder Include="ConfigurationProviders\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AspBetSample.DataBase\AspBetSample.DataBase.csproj" />
     <ProjectReference Include="..\AspNetSample.Business\AspNetSample.Business.csproj" />
     <ProjectReference Include="..\AspNetSample.Core\AspNetSample.Core.csproj" />
+    <ProjectReference Include="..\AspNetSample.Data.Repositoires\AspNetSample.Data.Repositories.csproj" />
   </ItemGroup>
 
 </Project>

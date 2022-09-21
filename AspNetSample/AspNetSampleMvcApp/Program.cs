@@ -1,7 +1,11 @@
 using AspBetSample.DataBase;
+using AspBetSample.DataBase.Entities;
 using AspNetSample.Business.ServicesImplementations;
 using AspNetSample.Core;
 using AspNetSample.Core.Abstractions;
+using AspNetSample.Data.Abstractions;
+using AspNetSample.Data.Abstractions.Repositories;
+using AspNetSample.Data.Repositories;
 using AspNetSampleMvcApp.ConfigurationProviders;
 using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.EntityFrameworkCore;
@@ -31,7 +35,7 @@ namespace AspNetSampleMvcApp
             builder.Services.AddControllersWithViews();
 
             var connectionString = builder.Configuration.GetConnectionString("Default");
-                //"Server=DESKTOP-11O0AN1\\SQLSERVER2019;Database=GoodNewsAggregatorDataBase;Trusted_Connection=True;";
+            //"Server=DESKTOP-11O0AN1\\SQLSERVER2019;Database=GoodNewsAggregatorDataBase;Trusted_Connection=True;";
 
             builder.Services.AddDbContext<GoodNewsAggregatorContext>(
                 optionsBuilder => optionsBuilder.UseSqlServer(connectionString));
@@ -40,6 +44,11 @@ namespace AspNetSampleMvcApp
 
             builder.Services.AddScoped<IArticleService, ArticleService>();
             builder.Services.AddScoped<ISourceService, SourceService>();
+            builder.Services.AddScoped<IAdditionalArticleRepository, ArticleGenericRepository>();
+            builder.Services.AddScoped<IRepository<Source>, Repository<Source>>();
+            builder.Services.AddScoped<IArticleRepository, ArticleRepository>();
+            builder.Services.AddScoped<ISourceRepository, SourceRepository>();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             builder.Configuration.AddJsonFile("secrets.json");
             //builder.Configuration.AddTextFile("somepath");
@@ -76,7 +85,7 @@ namespace AspNetSampleMvcApp
                 name: "article",
                 pattern: "{page:int=0}/{action}/{controller}",
                 defaults: new { controller = "Article", action = "Index" },
-                constraints: new {page = new IntRouteConstraint()} /*if no (:int?) or similar in pattern string*/);
+                constraints: new { page = new IntRouteConstraint() } /*if no (:int?) or similar in pattern string*/);
 
             //var str = string.Format("{0}/{1}/{2}", 1, 3, 5);
 

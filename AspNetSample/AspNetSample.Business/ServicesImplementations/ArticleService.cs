@@ -1,7 +1,10 @@
 ﻿using AspBetSample.DataBase;
 using AspBetSample.DataBase.Entities;
+using AspNetSample.Core;
 using AspNetSample.Core.Abstractions;
 using AspNetSample.Core.DataTransferObjects;
+using AspNetSample.Data.Abstractions;
+using AspNetSample.Data.Abstractions.Repositories;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -12,15 +15,16 @@ public class ArticleService : IArticleService
 {
     private readonly IMapper _mapper;
     private readonly IConfiguration _configuration;
-    private readonly GoodNewsAggregatorContext _databaseContext;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public ArticleService(GoodNewsAggregatorContext databaseContext,
-        IMapper mapper, 
-        IConfiguration configuration)
+
+    public ArticleService(IMapper mapper, 
+        IConfiguration configuration, 
+        IUnitOfWork unitOfWork)
     {
-        _databaseContext = databaseContext;
         _mapper = mapper;
         _configuration = configuration;
+        _unitOfWork = unitOfWork;
     }
 
 
@@ -32,7 +36,8 @@ public class ArticleService : IArticleService
             var myApiKey = _configuration.GetSection("UserSecrets")["MyApiKey"];
             var passwordSalt = _configuration["UserSecrets:PasswordSalt"];
             //_configuration.
-            var list = await _databaseContext.Articles
+            var list = await _unitOfWork.Articles
+                .Get()
                 .Skip(pageNumber * pageSize)
                 .Take(pageSize)
                 .Select(article => _mapper.Map<ArticleDto>(article))
@@ -56,7 +61,7 @@ public class ArticleService : IArticleService
 
     public async Task<ArticleDto> GetArticleByIdAsync(Guid id)
     {
-        var entity =  await _databaseContext.Articles.FirstOrDefaultAsync(article => article.Id.Equals(id));
+        var entity =  await _unitOfWork.Articles.GetByIdAsync(id);
         var dto = _mapper.Map<ArticleDto>(entity);
 
         return dto;
@@ -68,13 +73,27 @@ public class ArticleService : IArticleService
 
         if (entity!= null)
         {
-            await _databaseContext.Articles.AddAsync(entity);
-            var addingResult = await _databaseContext.SaveChangesAsync();
+            await _unitOfWork.Articles.AddAsync(entity);
+            var addingResult = await _unitOfWork.Commit();
             return addingResult;
         }
         else
         {
             throw new ArgumentException(nameof(dto));
         }
+    }
+
+    public async Task<int> PatchAsync(Guid id, List<PatchModel> patchList)
+    {
+        await _unitOfWork.Articles.PatchAsync(id, patchList);
+        return await _unitOfWork.Commit();
+    }
+
+    public async Task Do()
+    {
+        await _unitOfWork.Articles.AddAsync(new Article());
+        await _unitOfWork.Sources.AddAsync(new Source());
+        
+        await _unitOfWork.Commit();
     }
 }

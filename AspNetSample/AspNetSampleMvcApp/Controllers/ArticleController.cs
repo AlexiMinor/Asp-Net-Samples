@@ -1,13 +1,10 @@
-﻿using AspNetSample.Business.ServicesImplementations;
-using AspNetSample.Core;
+﻿using AspNetSample.Core;
 using AspNetSample.Core.Abstractions;
 using AspNetSample.Core.DataTransferObjects;
 using AspNetSampleMvcApp.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Serilog;
-using Serilog.Events;
 
 namespace AspNetSampleMvcApp.Controllers
 {
@@ -150,6 +147,23 @@ namespace AspNetSampleMvcApp.Controllers
                 {
                     var dto = _mapper.Map<ArticleDto>(model);
 
+                    var sourceDto = await _articleService.GetArticleByIdAsync(model.Id);
+
+                    //should be sure that dto property naming is the same with entity property naming
+                    var patchList = new List<PatchModel>();
+                    if (dto!=null)
+                    {
+                        if (dto.Title.Equals(sourceDto.Title))
+                        {
+                            patchList.Add(new PatchModel()
+                            {
+                                PropertyName = nameof(dto.Title), PropertyValue = dto.Title
+                            });
+                        }
+                    }
+
+                    await _articleService.PatchAsync(model.Id, patchList);
+
                     //await _articleService.CreateArticleAsync(dto);
 
                     return RedirectToAction("Index", "Article");
@@ -171,5 +185,6 @@ namespace AspNetSampleMvcApp.Controllers
         {
             return Ok();
         }
+
     }
 }

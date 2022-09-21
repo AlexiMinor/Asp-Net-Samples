@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="11.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\AspBetSample.DataBase\AspBetSample.DataBase.csproj" />
     <ProjectReference Include="..\AspNetSample.Core\AspNetSample.Core.csproj" />
     <ProjectReference Include="..\AspNetSample.Data.Abstractions\AspNetSample.Data.Abstractions.csproj" />

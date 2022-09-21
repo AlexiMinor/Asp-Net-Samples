@@ -16,3 +16,11 @@ AspNetSample/AspBetSample.DataBase/obj/
 AspNetSample/AspNetSample.Business/bin/
 
 AspNetSample/AspNetSample.Core/bin/
+
+AspNetSample/AspNetSample.Data.Abstractions/bin/
+
+AspNetSample/AspNetSample.Data.Abstractions/obj/
+
+AspNetSample/AspNetSample.Data.Repositoires/bin/
+
+AspNetSample/AspNetSample.Data.Repositoires/obj/
