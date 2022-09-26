@@ -7,6 +7,7 @@ using AspNetSample.Data.Abstractions;
 using AspNetSample.Data.Abstractions.Repositories;
 using AspNetSample.Data.Repositories;
 using AspNetSampleMvcApp.ConfigurationProviders;
+using AspNetSampleMvcApp.Filters;
 using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -32,7 +33,14 @@ namespace AspNetSampleMvcApp
             //}
 
             // Add services to the container.
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddControllersWithViews(options =>
+            {
+                //    options.Filters.Add<CustomActionFilter>();
+                //    //alternative options
+                //    options.Filters.Add(typeof(CustomActionFilter));
+                //    options.Filters.Add(new CustomActionFilter());
+
+            });
 
             var connectionString = builder.Configuration.GetConnectionString("Default");
             //"Server=DESKTOP-11O0AN1\\SQLSERVER2019;Database=GoodNewsAggregatorDataBase;Trusted_Connection=True;";
@@ -49,12 +57,13 @@ namespace AspNetSampleMvcApp
             builder.Services.AddScoped<IArticleRepository, ArticleRepository>();
             builder.Services.AddScoped<ISourceRepository, SourceRepository>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            //builder.Services.AddScoped<ArticleCheckerActionFilter>();
 
             builder.Configuration.AddJsonFile("secrets.json");
             //builder.Configuration.AddTextFile("somepath");
 
+            
             var app = builder.Build();
-
 
 
             // Configure the HTTP request pipeline.
@@ -67,7 +76,7 @@ namespace AspNetSampleMvcApp
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
+            
             app.UseRouting();
 
             app.UseAuthorization();

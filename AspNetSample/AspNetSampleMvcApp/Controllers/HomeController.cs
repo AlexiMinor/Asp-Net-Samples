@@ -1,9 +1,12 @@
 ﻿using AspNetSampleMvcApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using AspNetSampleMvcApp.Filters;
 
 namespace AspNetSampleMvcApp.Controllers
 {
+    //[CustomActionFilter]
+    [InternetExplorerBlockerFilter]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -13,14 +16,18 @@ namespace AspNetSampleMvcApp.Controllers
             _logger = logger;
         }
 
+        [AddDataToResponseHeaderFilter]
         public IActionResult Index()
         {
             return View();
         }
 
         [Route("Privacy")]
+        [HappyExceptionFilter("You'll read privacy policy in future.")]
         public IActionResult Privacy()
         {
+            var x = 0;
+            var z = 15 / x;
             return View();
         }
 
