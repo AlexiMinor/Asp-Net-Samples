@@ -34,7 +34,6 @@ public class ArticleService : IArticleService
         try
         {
             var myApiKey = _configuration.GetSection("UserSecrets")["MyApiKey"];
-            var passwordSalt = _configuration["UserSecrets:PasswordSalt"];
             //_configuration.
             var list = await _unitOfWork.Articles
                 .Get()

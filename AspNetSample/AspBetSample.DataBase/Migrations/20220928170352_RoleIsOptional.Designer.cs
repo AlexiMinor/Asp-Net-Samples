@@ -4,6 +4,7 @@ using AspBetSample.DataBase;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AspBetSample.DataBase.Migrations
 {
     [DbContext(typeof(GoodNewsAggregatorContext))]
-    partial class GoodNewsAggregatorContextModelSnapshot : ModelSnapshot
+    [Migration("20220928170352_RoleIsOptional")]
+    partial class RoleIsOptional
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -93,7 +95,7 @@ namespace AspBetSample.DataBase.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles");
+                    b.ToTable("Role");
                 });
 
             modelBuilder.Entity("AspBetSample.DataBase.Entities.Source", b =>
@@ -135,7 +137,7 @@ namespace AspBetSample.DataBase.Migrations
                     b.Property<DateTime>("RegistrationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("RoleId")
+                    b.Property<Guid?>("RoleId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -179,9 +181,7 @@ namespace AspBetSample.DataBase.Migrations
                 {
                     b.HasOne("AspBetSample.DataBase.Entities.Role", "Role")
                         .WithMany("Users")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("RoleId");
 
                     b.Navigation("Role");
                 });

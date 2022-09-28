@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AspNetSampleMvcApp.Models;
 
-public class RegisterModel
+public class LoginModel
 {
     [Required]
     [EmailAddress]
@@ -15,8 +15,5 @@ public class RegisterModel
     [Required]
     [DataType(DataType.Password)]
     public string Password { get; set; }
-
-    [Compare(nameof(Password))]
-    [DataType(DataType.Password)]
-    public string PasswordConfirmation { get; set; }
+    
 }

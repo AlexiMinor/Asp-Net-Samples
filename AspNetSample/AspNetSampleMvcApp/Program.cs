@@ -1,13 +1,11 @@
 using AspBetSample.DataBase;
 using AspBetSample.DataBase.Entities;
 using AspNetSample.Business.ServicesImplementations;
-using AspNetSample.Core;
 using AspNetSample.Core.Abstractions;
 using AspNetSample.Data.Abstractions;
 using AspNetSample.Data.Abstractions.Repositories;
 using AspNetSample.Data.Repositories;
-using AspNetSampleMvcApp.ConfigurationProviders;
-using AspNetSampleMvcApp.Filters;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -27,11 +25,6 @@ namespace AspNetSampleMvcApp
                     LogEventLevel.Information)
                     .WriteTo.Console(LogEventLevel.Verbose));
 
-            //foreach (var s in args)
-            //{
-            //    Console.WriteLine(s);
-            //}
-
             // Add services to the container.
             builder.Services.AddControllersWithViews(options =>
             {
@@ -39,8 +32,17 @@ namespace AspNetSampleMvcApp
                 //    //alternative options
                 //    options.Filters.Add(typeof(CustomActionFilter));
                 //    options.Filters.Add(new CustomActionFilter());
-
             });
+
+            builder.Services
+                .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.ExpireTimeSpan = TimeSpan.FromHours(1);
+                    options.LoginPath = new PathString(@"/Account/Login");
+                    options.LogoutPath = new PathString(@"/Account/Logout");
+                    options.AccessDeniedPath = new PathString(@"/Account/Login");
+                });
 
             var connectionString = builder.Configuration.GetConnectionString("Default");
             //"Server=DESKTOP-11O0AN1\\SQLSERVER2019;Database=GoodNewsAggregatorDataBase;Trusted_Connection=True;";
@@ -52,8 +54,12 @@ namespace AspNetSampleMvcApp
 
             builder.Services.AddScoped<IArticleService, ArticleService>();
             builder.Services.AddScoped<ISourceService, SourceService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IRoleService, RoleService>();
             builder.Services.AddScoped<IAdditionalArticleRepository, ArticleGenericRepository>();
             builder.Services.AddScoped<IRepository<Source>, Repository<Source>>();
+            builder.Services.AddScoped<IRepository<User>, Repository<User>>();
+            builder.Services.AddScoped<IRepository<Role>, Repository<Role>>();
             builder.Services.AddScoped<IArticleRepository, ArticleRepository>();
             builder.Services.AddScoped<ISourceRepository, SourceRepository>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -79,7 +85,8 @@ namespace AspNetSampleMvcApp
             
             app.UseRouting();
 
-            app.UseAuthorization();
+            app.UseAuthentication(); // Set HttpContext.User
+            app.UseAuthorization(); 
 
 
             //app.MapControllerRoute(

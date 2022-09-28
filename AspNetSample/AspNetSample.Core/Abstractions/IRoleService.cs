@@ -1,0 +1,10 @@
+﻿using AspNetSample.Core.DataTransferObjects;
+
+namespace AspNetSample.Core.Abstractions;
+
+public interface IRoleService
+{
+    Task<string> GetRoleNameByIdAsync(Guid id);
+    Task<Guid?> GetRoleIdByNameAsync(string name);
+   
+}
