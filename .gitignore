@@ -24,3 +24,15 @@ AspNetSample/AspNetSample.Data.Abstractions/obj/
 AspNetSample/AspNetSample.Data.Repositoires/bin/
 
 AspNetSample/AspNetSample.Data.Repositoires/obj/
+
+AspNetSample/packages/
+
+AspNetSample/WebApplication2/bin/
+
+AspNetSample/AspNetSampleMvcWithIdentityApp/bin/
+
+AspNetSample/AspNetSampleMvcWithIdentityApp/obj/
+
+AspNetSample/WebApplication1/bin/
+
+AspNetSample/WebApplication1/obj/

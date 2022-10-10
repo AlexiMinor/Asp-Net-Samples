@@ -11,9 +11,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetSample.Business", "As
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspBetSample.DataBase", "AspBetSample.DataBase\AspBetSample.DataBase.csproj", "{C866403E-34D6-45C2-AA93-DD0A2F870E15}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetSample.Data.Repositories", "AspNetSample.Data.Repositoires\AspNetSample.Data.Repositories.csproj", "{4B3A5C4C-0831-40EF-8959-235454CF2915}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetSample.Data.Repositories", "AspNetSample.Data.Repositoires\AspNetSample.Data.Repositories.csproj", "{4B3A5C4C-0831-40EF-8959-235454CF2915}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetSample.Data.Abstractions", "AspNetSample.Data.Abstractions\AspNetSample.Data.Abstractions.csproj", "{8F18BA77-B28B-4C50-BAE4-49A428F0DA21}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetSample.Data.Abstractions", "AspNetSample.Data.Abstractions\AspNetSample.Data.Abstractions.csproj", "{8F18BA77-B28B-4C50-BAE4-49A428F0DA21}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetSampleMvcWithIdentityApp", "AspNetSampleMvcWithIdentityApp\AspNetSampleMvcWithIdentityApp.csproj", "{3EB0F9EA-F87C-4867-9397-7D134BB72EE4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication1", "WebApplication1\WebApplication1.csproj", "{0BA18F4B-249A-4F7B-BC34-2C268A1467BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication2", "WebApplication2\WebApplication2.csproj", "{6DD02795-0DD2-4D0B-9F50-EDDE7FC3D383}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +51,18 @@ Global
 		{8F18BA77-B28B-4C50-BAE4-49A428F0DA21}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F18BA77-B28B-4C50-BAE4-49A428F0DA21}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F18BA77-B28B-4C50-BAE4-49A428F0DA21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EB0F9EA-F87C-4867-9397-7D134BB72EE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EB0F9EA-F87C-4867-9397-7D134BB72EE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EB0F9EA-F87C-4867-9397-7D134BB72EE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EB0F9EA-F87C-4867-9397-7D134BB72EE4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BA18F4B-249A-4F7B-BC34-2C268A1467BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BA18F4B-249A-4F7B-BC34-2C268A1467BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BA18F4B-249A-4F7B-BC34-2C268A1467BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BA18F4B-249A-4F7B-BC34-2C268A1467BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DD02795-0DD2-4D0B-9F50-EDDE7FC3D383}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DD02795-0DD2-4D0B-9F50-EDDE7FC3D383}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DD02795-0DD2-4D0B-9F50-EDDE7FC3D383}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DD02795-0DD2-4D0B-9F50-EDDE7FC3D383}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

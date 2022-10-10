@@ -10,7 +10,7 @@ using Serilog;
 
 namespace AspNetSampleMvcApp.Controllers
 {
-    [Authorize(Roles = "User")]
+    //[Authorize(Roles = "User, Admin")]
     public class ArticleController : Controller
     {
 
@@ -27,7 +27,7 @@ namespace AspNetSampleMvcApp.Controllers
             _sourceService = sourceService;
         }
 
-        public async Task<IActionResult> Index(int page)
+        public async Task<IActionResult> IndexAsync(int page)
         {
             try
             {
@@ -152,22 +152,7 @@ namespace AspNetSampleMvcApp.Controllers
                 {
                     var dto = _mapper.Map<ArticleDto>(model);
 
-                    var sourceDto = await _articleService.GetArticleByIdAsync(model.Id);
-
-                    //should be sure that dto property naming is the same with entity property naming
-                    var patchList = new List<PatchModel>();
-                    if (dto!=null)
-                    {
-                        if (dto.Title.Equals(sourceDto.Title))
-                        {
-                            patchList.Add(new PatchModel()
-                            {
-                                PropertyName = nameof(dto.Title), PropertyValue = dto.Title
-                            });
-                        }
-                    }
-
-                    await _articleService.PatchAsync(model.Id, patchList);
+                    await _articleService.UpdateArticleAsync(model.Id, dto);
 
                     //await _articleService.CreateArticleAsync(dto);
 

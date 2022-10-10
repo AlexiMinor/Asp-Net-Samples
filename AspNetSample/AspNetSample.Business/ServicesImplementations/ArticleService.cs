@@ -1,10 +1,8 @@
-﻿using AspBetSample.DataBase;
-using AspBetSample.DataBase.Entities;
+﻿using AspBetSample.DataBase.Entities;
 using AspNetSample.Core;
 using AspNetSample.Core.Abstractions;
 using AspNetSample.Core.DataTransferObjects;
 using AspNetSample.Data.Abstractions;
-using AspNetSample.Data.Abstractions.Repositories;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -82,8 +80,24 @@ public class ArticleService : IArticleService
         }
     }
 
-    public async Task<int> PatchAsync(Guid id, List<PatchModel> patchList)
+    public async Task<int> UpdateArticleAsync(Guid id, ArticleDto? dto)
     {
+        var sourceDto = await GetArticleByIdAsync(id);
+
+        //should be sure that dto property naming is the same with entity property naming
+        var patchList = new List<PatchModel>();
+        if (dto != null)
+        {
+            if (!dto.Title.Equals(sourceDto.Title))
+            {
+                patchList.Add(new PatchModel()
+                {
+                    PropertyName = nameof(dto.Title),
+                    PropertyValue = dto.Title
+                });
+            }
+        }
+
         await _unitOfWork.Articles.PatchAsync(id, patchList);
         return await _unitOfWork.Commit();
     }
