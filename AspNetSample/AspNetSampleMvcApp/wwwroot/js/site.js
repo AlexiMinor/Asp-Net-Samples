@@ -18,7 +18,6 @@ let printMessage = function (message) {
     console.log(message);
 }
 
-
 function showHelloMessage(user, value, value2) {
 
     let message = `Hello, ${user}`;
@@ -47,12 +46,8 @@ function sum(a, b) {
     return a + b;
 }
 
-
 function doSmth(sum) {
     sum();
 }
-
-
-
 
 //alert(message);

@@ -1,5 +1,4 @@
-﻿@using AspNetSampleMvcApp.Helpers
-@model IEnumerable<ArticleDto>
+﻿@model IEnumerable<ArticleDto>
 
 @{
     ViewData["Title"] = "View";
@@ -7,6 +6,7 @@
 }
 
 <h1 id="article-header">Articles</h1>
+
 
 <a href="~/article/create">Create article</a>
 
@@ -22,11 +22,16 @@
     }
 </div>
 
+<div class="row">
+    <button class="btn btn-primary col-12 col-sm-12 col-md-6 col-lg-4" onclick="changeBackgroundColorForPreviews()">
+        Change Background colors
+    </button>
+</div>
 @*@Html.GeneratePagintator(new int[]{1,2,3,4,5,6})*@
 
 
 @section CssStyles
-{
+    {
     <style>
         h1 {
             color: red;
@@ -34,7 +39,12 @@
     </style>
 }
 
-@* Don't use logic in views
+    @section Scripts
+    {
+    <script src="~/js/dom-samples.js" asp-append-version="true"></script>
+}
+
+    @* Don't use logic in views
 @{
     var x = 1;
     var y = new List<int>()

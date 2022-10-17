@@ -26,5 +26,7 @@ public class UserProfile : Profile
 
         CreateMap<LoginModel, UserDto>();
 
+        CreateMap<UserDto, UserDataModel>();
+
     }
 }
