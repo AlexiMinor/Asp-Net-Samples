@@ -36,3 +36,11 @@ AspNetSample/AspNetSampleMvcWithIdentityApp/obj/
 AspNetSample/WebApplication1/bin/
 
 AspNetSample/WebApplication1/obj/
+
+AspNetSample/AspNetSample.Mappers/bin/
+
+AspNetSample/AspNetSample.Mappers/obj/
+
+AspNetSample/AspNetSample.WebAPI/bin/
+
+AspNetSample/AspNetSample.WebAPI/obj/

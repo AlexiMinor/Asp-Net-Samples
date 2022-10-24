@@ -1,9 +1,12 @@
-﻿using AspBetSample.DataBase.Entities;
+﻿using System.ServiceModel.Syndication;
+using System.Xml;
+using AspBetSample.DataBase.Entities;
 using AspNetSample.Core;
 using AspNetSample.Core.Abstractions;
 using AspNetSample.Core.DataTransferObjects;
 using AspNetSample.Data.Abstractions;
 using AutoMapper;
+using HtmlAgilityPack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -56,6 +59,28 @@ public class ArticleService : IArticleService
         return list;
     }
 
+    public async Task<List<ArticleDto>> GetArticlesByNameAndSourcesAsync(string? name, Guid? sourceId)
+    {
+        var list = new List<ArticleDto>();
+
+        var entities = _unitOfWork.Articles.Get();
+
+        if (!string.IsNullOrEmpty(name))
+        {
+            entities = entities.Where(dto => dto.Title.Contains(name));
+        }
+
+        if (sourceId!=null && !Guid.Empty.Equals(sourceId))
+        {
+            entities = entities.Where(dto => dto.SourceId.Equals(sourceId));
+        }
+
+        var result = (await entities.ToListAsync())
+            .Select(ent => _mapper.Map<ArticleDto>(ent))
+            .ToList();
+        return result;
+    }
+
     public async Task<ArticleDto> GetArticleByIdAsync(Guid id)
     {
         var entity =  await _unitOfWork.Articles.GetByIdAsync(id);
@@ -102,11 +127,120 @@ public class ArticleService : IArticleService
         return await _unitOfWork.Commit();
     }
 
-    public async Task Do()
+    public async Task GetAllArticleDataFromRssAsync(Guid sourceId, string? sourceRssUrl)
     {
-        await _unitOfWork.Articles.AddAsync(new Article());
-        await _unitOfWork.Sources.AddAsync(new Source());
-        
-        await _unitOfWork.Commit();
+        if (!string.IsNullOrEmpty(sourceRssUrl))
+        {
+            var list = new List<ArticleDto>();
+
+            using (var reader = XmlReader.Create(sourceRssUrl))
+            {
+                var feed = SyndicationFeed.Load(reader);
+                
+                foreach (var item in feed.Items)
+                {
+                    //should be checked for different rss sources
+                    var articleDto = new ArticleDto()
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = item.Title.Text,
+                        PublicationDate = item.PublishDate.UtcDateTime,
+                        ShortSummary = item.Summary.Text,
+                        Category = item.Categories.FirstOrDefault()?.Name,
+                        SourceId = sourceId,
+                        SourceUrl = item.Id
+                    };
+                    list.Add(articleDto);
+                }
+            }
+
+            var oldArticleUrls = await _unitOfWork.Articles.Get()
+                .Select(article => article.SourceUrl)
+                .Distinct()
+                .ToArrayAsync();
+
+            var entities = list.Where(dto => !oldArticleUrls.Contains(dto.SourceUrl))
+                .Select(dto => _mapper.Map<Article>(dto)).ToArray();
+
+            await _unitOfWork.Articles.AddRangeAsync(entities);
+            await _unitOfWork.Commit();
+
+        }
+    }
+
+    public async Task AddArticleTextToArticlesAsync()
+    {
+        var articlesWithEmptyTextIds = _unitOfWork.Articles.Get()
+            .Where(article => string.IsNullOrEmpty(article.Text))
+            .Select(article => article.Id)
+            .ToList();
+
+        foreach (var articleId in articlesWithEmptyTextIds)
+        {
+            await AddArticleTextToArticleAsync(articleId);
+        }
+    }
+
+    private async Task AddArticleTextToArticleAsync(Guid articleId)
+    {
+        try
+        {
+            var article = await _unitOfWork.Articles.GetByIdAsync(articleId);
+
+            if (article == null)
+            {
+                throw new ArgumentException($"Article with id: {articleId} doesn't exists",
+                    nameof(articleId));
+            }
+
+            var articleSourceUrl = article.SourceUrl;
+
+            var web = new HtmlWeb();
+            var htmlDoc = web.Load(articleSourceUrl);
+            var nodes =
+                htmlDoc.DocumentNode.Descendants(0)
+                    .Where(n => n.HasClass("news-text"));
+
+            if (nodes.Any())
+            {
+                var articleText = nodes.FirstOrDefault()?
+                    .ChildNodes
+                    .Where(node => (node.Name.Equals("p") || node.Name.Equals("div") || node.Name.Equals("h2")) 
+                                   && !node.HasClass("news-reference") 
+                                   && !node.HasClass("news-banner")
+                                   && !node.HasClass("news-widget")
+                                   && !node.HasClass("news-vote")
+                                   && node.Attributes["style"] == null)
+                    .Select(node => node.OuterHtml)
+                    .Aggregate((i, j) => i + Environment.NewLine + j);
+
+
+                await _unitOfWork.Articles.UpdateArticleTextAsync(articleId, articleText);
+                await _unitOfWork.Commit();
+            }
+            
+
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+    }
+
+    public async Task DeleteArticleAsync(Guid id)
+    {
+
+        var entity = await _unitOfWork.Articles.GetByIdAsync(id);
+
+        if (entity != null)
+        {
+            _unitOfWork.Articles.Remove(entity);
+
+            await _unitOfWork.Commit();
+        }
+        else
+        {
+            throw new ArgumentException("Article for removing doesn't exist", nameof(id));
+        }
     }
 }

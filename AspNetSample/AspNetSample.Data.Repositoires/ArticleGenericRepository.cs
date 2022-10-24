@@ -1,6 +1,7 @@
 ﻿using AspBetSample.DataBase;
 using AspBetSample.DataBase.Entities;
 using AspNetSample.Data.Abstractions.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace AspNetSample.Data.Repositories;
 
@@ -11,8 +12,12 @@ public class ArticleGenericRepository : Repository<Article>, IAdditionalArticleR
     {
     }
 
-    public void DoCustomMethod()
+    public async Task UpdateArticleTextAsync(Guid id, string text)
     {
-        throw new NotImplementedException();
+        var article = await DbSet.FirstOrDefaultAsync(a => a.Id.Equals(id));
+        if (article!= null)
+        {
+            article.Text = text;
+        }
     }
 }

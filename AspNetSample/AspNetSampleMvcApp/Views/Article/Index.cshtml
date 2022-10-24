@@ -1,5 +1,4 @@
-﻿@model IEnumerable<ArticleDto>
-
+﻿@model ArticlesListWithUserRoleModel
 @{
     ViewData["Title"] = "View";
     //Layout = null;
@@ -7,13 +6,14 @@
 
 <h1 id="article-header">Articles</h1>
 
-
-<a href="~/article/create">Create article</a>
+@if(Model.IsAdmin){
+    <a href="~/article/create">Create article</a>
+}
 
 <div class="row">
-    @if (Model.Any())
+    @if (Model.Articles.Any())
     {
-        foreach (var item in Model)
+        foreach (var item in Model.Articles)
         {
             @*@await Html.PartialAsync("ArticlePreview", item)*@
 
