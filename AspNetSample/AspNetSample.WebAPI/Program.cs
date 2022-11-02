@@ -5,6 +5,8 @@ using AspNetSample.Core.Abstractions;
 using AspNetSample.Data.Abstractions;
 using AspNetSample.Data.Abstractions.Repositories;
 using AspNetSample.Data.Repositories;
+using Hangfire;
+using Hangfire.SqlServer;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
@@ -34,6 +36,23 @@ namespace AspNetSample.WebAPI
             builder.Services.AddDbContext<GoodNewsAggregatorContext>(
             optionsBuilder => optionsBuilder.UseSqlServer(connectionString));
 
+            builder.Services.AddHangfire(configuration => configuration
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UseSqlServerStorage(connectionString, 
+                    new SqlServerStorageOptions
+                {
+                    CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                    SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+                    QueuePollInterval = TimeSpan.Zero,
+                    UseRecommendedIsolationLevel = true,
+                    DisableGlobalLocks = true,
+                }));
+
+            // Add the processing server as IHostedService
+            builder.Services.AddHangfireServer();
+
             builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             builder.Services.AddScoped<IArticleService, ArticleService>();
@@ -56,6 +75,9 @@ namespace AspNetSample.WebAPI
             } );
 
             var app = builder.Build();
+            app.UseStaticFiles();
+            app.UseHangfireDashboard();
+
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -70,6 +92,7 @@ namespace AspNetSample.WebAPI
 
 
             app.MapControllers();
+            app.MapHangfireDashboard();
 
             app.Run();
         }

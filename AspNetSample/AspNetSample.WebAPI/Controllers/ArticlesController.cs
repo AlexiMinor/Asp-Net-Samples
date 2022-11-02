@@ -3,6 +3,7 @@ using AspNetSample.Core.DataTransferObjects;
 using AspNetSample.WebAPI.Models.Requests;
 using AspNetSample.WebAPI.Models.Responses;
 using AutoMapper;
+using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AspNetSample.WebAPI.Controllers
@@ -55,6 +56,10 @@ namespace AspNetSample.WebAPI.Controllers
         {
             IEnumerable<ArticleDto> articles = await _articleService
                 .GetArticlesByNameAndSourcesAsync(model?.Name, model?.SourceId);
+
+            var jobId = BackgroundJob.Enqueue(() => Console.WriteLine(HttpContext.Request.Method));
+            var jobId2 = BackgroundJob.Schedule(() => Console.WriteLine(HttpContext.Request.Method), 
+                TimeSpan.FromMinutes(1));
 
 
             return Ok(articles.ToList());

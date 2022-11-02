@@ -1,6 +1,10 @@
-﻿using System.ServiceModel.Syndication;
+﻿using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.ServiceModel.Syndication;
+using System.Text;
 using System.Xml;
 using AspBetSample.DataBase.Entities;
+using AspNetSample.Business.Models;
 using AspNetSample.Core;
 using AspNetSample.Core.Abstractions;
 using AspNetSample.Core.DataTransferObjects;
@@ -9,6 +13,7 @@ using AutoMapper;
 using HtmlAgilityPack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace AspNetSample.Business.ServicesImplementations;
 
@@ -53,10 +58,15 @@ public class ArticleService : IArticleService
        
     }
 
-    public async Task<List<ArticleDto>> GetNewArticlesFromExternalSourcesAsync()
+    public async Task AggregateArticlesFromExternalSourcesAsync()
     {
-        var list = new List<ArticleDto>();
-        return list;
+        var sources = await _unitOfWork.Sources.GetAllAsync();
+        
+        foreach (var source in sources)
+        {
+            await GetAllArticleDataFromRssAsync(source.Id, source.RssUrl);
+            await AddArticleTextToArticlesAsync();
+        }
     }
 
     public async Task<List<ArticleDto>> GetArticlesByNameAndSourcesAsync(string? name, Guid? sourceId)
@@ -127,7 +137,57 @@ public class ArticleService : IArticleService
         return await _unitOfWork.Commit();
     }
 
-    public async Task GetAllArticleDataFromRssAsync(Guid sourceId, string? sourceRssUrl)
+    public async Task GetAllArticleDataFromRssAsync()
+    {
+        var sources = await _unitOfWork.Sources.GetAllAsync();
+
+        Parallel.ForEach(sources, (source) => GetAllArticleDataFromRssAsync(source.Id, source.RssUrl).Wait());
+    }
+ 
+    public async Task AddArticleTextToArticlesAsync()
+    {
+        var articlesWithEmptyTextIds = _unitOfWork.Articles.Get()
+            .Where(article => string.IsNullOrEmpty(article.Text))
+            .Select(article => article.Id)
+            .ToList();
+
+        foreach (var articleId in articlesWithEmptyTextIds)
+        {
+            await AddArticleTextToArticleAsync(articleId);
+        }
+    }
+
+    public async Task AddRateToArticlesAsync()
+    {
+        var articlesWithEmptyRateIds = _unitOfWork.Articles.Get()
+            .Where(article => article.Rate == null && !string.IsNullOrEmpty(article.Text))
+            .Select(article => article.Id)
+            .ToList();
+
+        foreach (var articleId in articlesWithEmptyRateIds)
+        {
+            await RateArticleAsync(articleId);
+        }
+    }
+
+    public async Task DeleteArticleAsync(Guid id)
+    {
+
+        var entity = await _unitOfWork.Articles.GetByIdAsync(id);
+
+        if (entity != null)
+        {
+            _unitOfWork.Articles.Remove(entity);
+
+            await _unitOfWork.Commit();
+        }
+        else
+        {
+            throw new ArgumentException("Article for removing doesn't exist", nameof(id));
+        }
+    }
+
+    private async Task GetAllArticleDataFromRssAsync(Guid sourceId, string? sourceRssUrl)
     {
         if (!string.IsNullOrEmpty(sourceRssUrl))
         {
@@ -136,7 +196,7 @@ public class ArticleService : IArticleService
             using (var reader = XmlReader.Create(sourceRssUrl))
             {
                 var feed = SyndicationFeed.Load(reader);
-                
+
                 foreach (var item in feed.Items)
                 {
                     //should be checked for different rss sources
@@ -168,19 +228,6 @@ public class ArticleService : IArticleService
         }
     }
 
-    public async Task AddArticleTextToArticlesAsync()
-    {
-        var articlesWithEmptyTextIds = _unitOfWork.Articles.Get()
-            .Where(article => string.IsNullOrEmpty(article.Text))
-            .Select(article => article.Id)
-            .ToList();
-
-        foreach (var articleId in articlesWithEmptyTextIds)
-        {
-            await AddArticleTextToArticleAsync(articleId);
-        }
-    }
-
     private async Task AddArticleTextToArticleAsync(Guid articleId)
     {
         try
@@ -205,8 +252,8 @@ public class ArticleService : IArticleService
             {
                 var articleText = nodes.FirstOrDefault()?
                     .ChildNodes
-                    .Where(node => (node.Name.Equals("p") || node.Name.Equals("div") || node.Name.Equals("h2")) 
-                                   && !node.HasClass("news-reference") 
+                    .Where(node => (node.Name.Equals("p") || node.Name.Equals("div") || node.Name.Equals("h2"))
+                                   && !node.HasClass("news-reference")
                                    && !node.HasClass("news-banner")
                                    && !node.HasClass("news-widget")
                                    && !node.HasClass("news-vote")
@@ -218,7 +265,7 @@ public class ArticleService : IArticleService
                 await _unitOfWork.Articles.UpdateArticleTextAsync(articleId, articleText);
                 await _unitOfWork.Commit();
             }
-            
+
 
         }
         catch (Exception ex)
@@ -227,20 +274,43 @@ public class ArticleService : IArticleService
         }
     }
 
-    public async Task DeleteArticleAsync(Guid id)
+    private async Task RateArticleAsync(Guid articleId)
     {
-
-        var entity = await _unitOfWork.Articles.GetByIdAsync(id);
-
-        if (entity != null)
+        try
         {
-            _unitOfWork.Articles.Remove(entity);
+            var article = await _unitOfWork.Articles.GetByIdAsync(articleId);
 
-            await _unitOfWork.Commit();
+            if (article == null)
+            {
+                throw new ArgumentException($"Article with id: {articleId} doesn't exists",
+                    nameof(articleId));
+            }
+
+            using (var client = new HttpClient())
+            {
+                var httpRequest = new HttpRequestMessage(HttpMethod.Post, 
+                    new Uri(@"https://api.ispras.ru/texterra/v1/nlp?targetType=lemma&apikey=YOUR_KEY"));
+                httpRequest.Headers.Add("Accept", "application/json");
+
+                httpRequest.Content = JsonContent.Create(new[] {new TextRequestModel() { Text = article.Text}});
+
+                var response = await client.SendAsync(httpRequest);
+                var responseStr = await response.Content.ReadAsStreamAsync();
+
+                using (var sr = new StreamReader(responseStr))
+                {
+                    var data = await sr.ReadToEndAsync();
+
+                    var resp = JsonConvert.DeserializeObject<IsprassResponseObject[]>(data);
+                }
+            }
+
+
         }
-        else
+        catch (Exception ex)
         {
-            throw new ArgumentException("Article for removing doesn't exist", nameof(id));
+            throw;
         }
     }
+
 }

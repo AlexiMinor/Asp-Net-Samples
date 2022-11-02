@@ -10,6 +10,7 @@ public class ArticleDto
     public string? ShortSummary { get; set; }
     
     public string? Text { get; set; }
+    public double? Rate { get; set; }
 
     public string SourceUrl { get; set; }
 

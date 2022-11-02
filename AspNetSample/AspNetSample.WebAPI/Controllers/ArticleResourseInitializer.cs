@@ -2,6 +2,7 @@
 using AspNetSample.WebAPI.Models.Requests;
 using AspNetSample.WebAPI.Models.Responses;
 using AutoMapper;
+using Hangfire;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,13 +31,31 @@ namespace AspNetSample.WebAPI.Controllers
         {
             try
             {
-                var sources = await _sourceService.GetSourcesAsync();
-                foreach (var source in sources)
-                {
-                    await _articleService.GetAllArticleDataFromRssAsync(source.Id, source.RssUrl);
-                    await _articleService.AddArticleTextToArticlesAsync();
+                //RecurringJob.AddOrUpdate(() => _articleService.AggregateArticlesFromExternalSourcesAsync(),
+                //    "5,10,35 10-18 * * Mon-Fri");
 
-                }
+                    RecurringJob.RemoveIfExists(nameof(_articleService.AggregateArticlesFromExternalSourcesAsync));
+
+                RecurringJob.AddOrUpdate(()=>_articleService.GetAllArticleDataFromRssAsync(),
+                    "*/15 * * * *");
+                RecurringJob.AddOrUpdate(()=>_articleService.AddArticleTextToArticlesAsync(),
+                    "*/30 * * * *");
+                
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ErrorModel() { Message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> RateArticles()
+        {
+            try
+            {
+                await _articleService.AddRateToArticlesAsync();
+
                 return Ok();
             }
             catch (Exception ex)

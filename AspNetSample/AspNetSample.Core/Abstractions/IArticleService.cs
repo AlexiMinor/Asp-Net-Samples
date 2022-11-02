@@ -7,7 +7,7 @@ public interface IArticleService
     Task<List<ArticleDto>> GetArticlesByPageNumberAndPageSizeAsync
         (int pageNumber, int pageSize);
 
-    Task<List<ArticleDto>> GetNewArticlesFromExternalSourcesAsync();
+    Task AggregateArticlesFromExternalSourcesAsync();
     
     Task<List<ArticleDto>> GetArticlesByNameAndSourcesAsync(string? name, Guid? category);
 
@@ -17,9 +17,11 @@ public interface IArticleService
 
     Task<int> UpdateArticleAsync(Guid id, ArticleDto? patchList);
 
-    Task GetAllArticleDataFromRssAsync(Guid sourceId, string? sourceRssUrl);
+    Task GetAllArticleDataFromRssAsync();
     
     Task AddArticleTextToArticlesAsync();
 
     Task DeleteArticleAsync(Guid id);
+
+    Task AddRateToArticlesAsync();
 }
