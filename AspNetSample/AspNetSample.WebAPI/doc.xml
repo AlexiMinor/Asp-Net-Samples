@@ -91,6 +91,20 @@
             <param name="model"></param>
             <returns></returns>
         </member>
+        <member name="M:AspNetSample.WebAPI.Controllers.TokenController.CreateJwtToken(AspNetSample.WebAPI.Models.Requests.LoginUserRequestModel)">
+            <summary>
+            Register user
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AspNetSample.WebAPI.Controllers.UserController.Create(AspNetSample.WebAPI.Models.Requests.RegisterUserRequestModel)">
+            <summary>
+            Register user
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
         <member name="T:AspNetSample.WebAPI.Models.Requests.AddOrUpdateArticleRequestModel">
             <summary>
             

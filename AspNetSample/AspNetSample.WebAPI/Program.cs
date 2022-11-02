@@ -1,3 +1,4 @@
+using System.Text;
 using AspBetSample.DataBase;
 using AspBetSample.DataBase.Entities;
 using AspNetSample.Business.ServicesImplementations;
@@ -5,9 +6,12 @@ using AspNetSample.Core.Abstractions;
 using AspNetSample.Data.Abstractions;
 using AspNetSample.Data.Abstractions.Repositories;
 using AspNetSample.Data.Repositories;
+using AspNetSample.WebAPI.Utils;
 using Hangfire;
 using Hangfire.SqlServer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Events;
 
@@ -66,6 +70,7 @@ namespace AspNetSample.WebAPI
             builder.Services.AddScoped<IArticleRepository, ArticleRepository>();
             builder.Services.AddScoped<ISourceRepository, SourceRepository>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<IJwtUtil, JwtUtilSha256>();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -74,25 +79,44 @@ namespace AspNetSample.WebAPI
                 options.IncludeXmlComments(builder.Configuration["XmlDoc"]);
             } );
 
+            builder.Services
+                .AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(opt =>
+                {
+                    opt.RequireHttpsMetadata = false;
+                    opt.SaveToken = true;
+                    opt.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidIssuer = builder.Configuration["Token:Issuer"],
+                        ValidAudience = builder.Configuration["Token:Issuer"],
+                        IssuerSigningKey =
+                            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Token:JwtSecret"])),
+                        ClockSkew = TimeSpan.Zero
+                    };
+                });
+
             var app = builder.Build();
             app.UseStaticFiles();
             app.UseHangfireDashboard();
-
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+            app.UseRouting();
 
             app.UseHttpsRedirection();
 
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            app.MapHangfireDashboard();
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
             app.MapControllers();
-            app.MapHangfireDashboard();
+            
 
             app.Run();
         }

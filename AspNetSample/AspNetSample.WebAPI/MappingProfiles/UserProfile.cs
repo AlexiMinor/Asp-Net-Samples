@@ -1,5 +1,6 @@
 ﻿using AspBetSample.DataBase.Entities;
 using AspNetSample.Core.DataTransferObjects;
+using AspNetSample.WebAPI.Models.Requests;
 using AutoMapper;
 
 namespace AspNetSampleMvcApp.MappingProfiles;
@@ -21,5 +22,6 @@ public class UserProfile : Profile
                 opt
                     => opt.MapFrom(dto => DateTime.Now));
 
+        CreateMap<RegisterUserRequestModel, UserDto>();
     }
 }

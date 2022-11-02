@@ -43,7 +43,7 @@ namespace AspNetSampleMvcApp.Controllers
                 if (userDto != null && userRoleId != null)
                 {
                     userDto.RoleId = userRoleId.Value;
-                    var result = await _userService.RegisterUser(userDto);
+                    var result = await _userService.RegisterUser(userDto, model.Password);
                     if (result > 0)
                     {
                         await Authenticate(model.Email);
