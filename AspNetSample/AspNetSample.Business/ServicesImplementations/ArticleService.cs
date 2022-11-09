@@ -9,8 +9,11 @@ using AspNetSample.Core;
 using AspNetSample.Core.Abstractions;
 using AspNetSample.Core.DataTransferObjects;
 using AspNetSample.Data.Abstractions;
+using AspNetSample.Data.CQS.Commands;
+using AspNetSample.Data.CQS.Handlers.QueryHandlers;
 using AutoMapper;
 using HtmlAgilityPack;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -22,15 +25,17 @@ public class ArticleService : IArticleService
     private readonly IMapper _mapper;
     private readonly IConfiguration _configuration;
     private readonly IUnitOfWork _unitOfWork;
-
+    private readonly IMediator _mediator;
 
     public ArticleService(IMapper mapper, 
         IConfiguration configuration, 
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork, 
+        IMediator mediator)
     {
         _mapper = mapper;
         _configuration = configuration;
         _unitOfWork = unitOfWork;
+        _mediator = mediator;
     }
 
 
@@ -93,9 +98,7 @@ public class ArticleService : IArticleService
 
     public async Task<ArticleDto> GetArticleByIdAsync(Guid id)
     {
-        var entity =  await _unitOfWork.Articles.GetByIdAsync(id);
-        var dto = _mapper.Map<ArticleDto>(entity);
-
+        var dto = await _mediator.Send(new GetArticleByIdQuery() { Id = id });
         return dto;
     }
 
@@ -146,15 +149,17 @@ public class ArticleService : IArticleService
  
     public async Task AddArticleTextToArticlesAsync()
     {
-        var articlesWithEmptyTextIds = _unitOfWork.Articles.Get()
-            .Where(article => string.IsNullOrEmpty(article.Text))
-            .Select(article => article.Id)
-            .ToList();
+        var articlesWithEmptyTextIds = await _mediator
+            .Send(new GetAllArticlesWithoutTextIdsQuery());
 
-        foreach (var articleId in articlesWithEmptyTextIds)
+        if (articlesWithEmptyTextIds != null)
         {
-            await AddArticleTextToArticleAsync(articleId);
+            foreach (var articleId in articlesWithEmptyTextIds)
+            {
+                await AddArticleTextToArticleAsync(articleId);
+            }
         }
+     
     }
 
     public async Task AddRateToArticlesAsync()
@@ -197,34 +202,20 @@ public class ArticleService : IArticleService
             {
                 var feed = SyndicationFeed.Load(reader);
 
-                foreach (var item in feed.Items)
+                list.AddRange(feed.Items.Select(item => new ArticleDto()
                 {
-                    //should be checked for different rss sources
-                    var articleDto = new ArticleDto()
-                    {
-                        Id = Guid.NewGuid(),
-                        Title = item.Title.Text,
-                        PublicationDate = item.PublishDate.UtcDateTime,
-                        ShortSummary = item.Summary.Text,
-                        Category = item.Categories.FirstOrDefault()?.Name,
-                        SourceId = sourceId,
-                        SourceUrl = item.Id
-                    };
-                    list.Add(articleDto);
-                }
+                    Id = Guid.NewGuid(),
+                    Title = item.Title.Text,
+                    PublicationDate = item.PublishDate.UtcDateTime,
+                    ShortSummary = item.Summary.Text,
+                    Category = item.Categories.FirstOrDefault()?.Name,
+                    SourceId = sourceId,
+                    SourceUrl = item.Id
+                }));
             }
 
-            var oldArticleUrls = await _unitOfWork.Articles.Get()
-                .Select(article => article.SourceUrl)
-                .Distinct()
-                .ToArrayAsync();
-
-            var entities = list.Where(dto => !oldArticleUrls.Contains(dto.SourceUrl))
-                .Select(dto => _mapper.Map<Article>(dto)).ToArray();
-
-            await _unitOfWork.Articles.AddRangeAsync(entities);
-            await _unitOfWork.Commit();
-
+            await _mediator.Send(new AddArticleDataFromRssFeedCommand()
+                { Articles = list });
         }
     }
 
@@ -262,8 +253,7 @@ public class ArticleService : IArticleService
                     .Aggregate((i, j) => i + Environment.NewLine + j);
 
 
-                await _unitOfWork.Articles.UpdateArticleTextAsync(articleId, articleText);
-                await _unitOfWork.Commit();
+                await _mediator.Send(new UpdateArticleTextCommand() { Id = articleId, Text = articleText });
             }
 
 

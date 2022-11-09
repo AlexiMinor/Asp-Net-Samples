@@ -44,3 +44,5 @@ AspNetSample/AspNetSample.Mappers/obj/
 AspNetSample/AspNetSample.WebAPI/bin/
 
 AspNetSample/AspNetSample.WebAPI/obj/
+/AspNetSample/AspNetSample.Data.CQS/bin/Debug/net6.0
+/AspNetSample/AspNetSample.Data.CQS/obj

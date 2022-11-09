@@ -5,10 +5,13 @@ using AspNetSample.Business.ServicesImplementations;
 using AspNetSample.Core.Abstractions;
 using AspNetSample.Data.Abstractions;
 using AspNetSample.Data.Abstractions.Repositories;
+using AspNetSample.Data.CQS.Commands;
+using AspNetSample.Data.CQS.Handlers.CommandHandlers;
 using AspNetSample.Data.Repositories;
 using AspNetSample.WebAPI.Utils;
 using Hangfire;
 using Hangfire.SqlServer;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -71,6 +74,8 @@ namespace AspNetSample.WebAPI
             builder.Services.AddScoped<ISourceRepository, SourceRepository>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IJwtUtil, JwtUtilSha256>();
+            
+            builder.Services.AddMediatR(typeof(AddArticleDataFromRssFeedCommand).Assembly);
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
