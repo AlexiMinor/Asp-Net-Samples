@@ -11,7 +11,7 @@ namespace AspNetSample.WebAPI.Controllers
     /// <summary>
     /// Controller for work with articles
     /// </summary>
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class ArticlesController : ControllerBase
     {

@@ -97,7 +97,7 @@ namespace AspNetSampleMvcApp.Controllers
 
         private async Task Authenticate(string email)
         {
-            var userDto = await _userService.GetUserByEmailAsync(email);
+            var userDto = _userService.GetUserByEmailAsync(email);
 
             var claims = new List<Claim>()
             {
@@ -138,7 +138,7 @@ namespace AspNetSampleMvcApp.Controllers
                     return BadRequest();
                 }
 
-                var user = _mapper.Map<UserDataModel>(await _userService.GetUserByEmailAsync(userEmail));
+                var user = _mapper.Map<UserDataModel>(_userService.GetUserByEmailAsync(userEmail));
                 return View(user);
             }
 
@@ -156,7 +156,7 @@ namespace AspNetSampleMvcApp.Controllers
                 return BadRequest();
             }
 
-            var user = _mapper.Map<UserDataModel>(await _userService.GetUserByEmailAsync(userEmail));
+            var user = _mapper.Map<UserDataModel>(_userService.GetUserByEmailAsync(userEmail));
             return Ok(user);
         }
 

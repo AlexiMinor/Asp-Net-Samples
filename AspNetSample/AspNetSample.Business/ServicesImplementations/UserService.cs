@@ -2,7 +2,9 @@
 using AspNetSample.Core.Abstractions;
 using AspNetSample.Core.DataTransferObjects;
 using AspNetSample.Data.Abstractions;
+using AspNetSample.Data.CQS.Handlers.QueryHandlers;
 using AutoMapper;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -13,15 +15,17 @@ public class UserService : IUserService
     private readonly IMapper _mapper;
     private readonly IConfiguration _configuration;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMediator _mediator;
 
 
     public UserService(IMapper mapper,
         IConfiguration configuration,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork, IMediator mediator)
     {
         _mapper = mapper;
         _configuration = configuration;
         _unitOfWork = unitOfWork;
+        _mediator = mediator;
     }
 
 
@@ -55,8 +59,8 @@ public class UserService : IUserService
     {
         var dbPasswordHash = (await _unitOfWork.Users.GetByIdAsync(userId))?.PasswordHash;
 
-        return 
-            dbPasswordHash != null 
+        return
+            dbPasswordHash != null
             && CreateMd5($"{password}.{_configuration["Secret:PasswordSalt"]}").Equals(dbPasswordHash);
     }
 
@@ -70,17 +74,16 @@ public class UserService : IUserService
         return await _unitOfWork.Commit();
     }
 
-
-    public async Task<UserDto?> GetUserByEmailAsync(string email)
+    public UserDto? GetUserByEmailAsync(string email)
     {
-        var user = await _unitOfWork.Users
+        var user = _unitOfWork.Users
             .FindBy(us => us.Email.Equals(email),
                 us => us.Role)
-            .FirstOrDefaultAsync();
+            .FirstOrDefault();
 
-        return 
+        return
             user != null ?
-            _mapper.Map<UserDto>(user) : 
+            _mapper.Map<UserDto>(user) :
             null;
     }
 
@@ -97,6 +100,10 @@ public class UserService : IUserService
         }
     }
 
+    public async Task<UserDto?> GetUserByRefreshTokenAsync(Guid token)
+    {
+        var user = await _mediator.Send(new GetUserByRefreshTokenQuery() { RefreshToken = token });
 
-
+        return user;
+    }
 }

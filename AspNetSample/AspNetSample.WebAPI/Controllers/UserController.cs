@@ -62,9 +62,9 @@ namespace AspNetSample.WebAPI.Controllers
                     var result = await _userService.RegisterUser(userDto, request.Password);
                     if (result > 0)
                     {
-                        var userInDbDto = await _userService.GetUserByEmailAsync(userDto.Email);
+                        var userInDbDto =  _userService.GetUserByEmailAsync(userDto.Email);
 
-                        var response = _jwtUtil.GenerateToken(userInDbDto);
+                        var response = await _jwtUtil.GenerateTokenAsync(userInDbDto);
 
                         return Ok(response);
                     }

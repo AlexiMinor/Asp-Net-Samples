@@ -11,4 +11,5 @@ public class User : IBaseEntity
     public Role Role { get; set; }
 
     public List<Comment> Comments { get; set; }
+    public List<RefreshToken> RefreshTokens { get; set; }
 }

@@ -2,7 +2,9 @@
 using System.Security.Claims;
 using System.Text;
 using AspNetSample.Core.DataTransferObjects;
+using AspNetSample.Data.CQS.Commands;
 using AspNetSample.WebAPI.Models.Responses;
+using MediatR;
 using Microsoft.IdentityModel.Tokens;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
@@ -11,13 +13,16 @@ namespace AspNetSample.WebAPI.Utils;
 public class JwtUtilSha256 : IJwtUtil
 {
     private readonly IConfiguration _configuration;
+    private readonly IMediator _mediator;
 
-    public JwtUtilSha256(IConfiguration configuration)
+    public JwtUtilSha256(IConfiguration configuration, 
+        IMediator mediator)
     {
         _configuration = configuration;
+        _mediator = mediator;
     }
 
-    public TokenResponse GenerateToken(UserDto dto)
+    public async Task<TokenResponse> GenerateTokenAsync(UserDto dto)
     {
         var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Token:JwtSecret"]));
         var credentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
@@ -40,13 +45,30 @@ public class JwtUtilSha256 : IJwtUtil
             signingCredentials: credentials);
 
         var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+        
+        var refreshTokenValue = Guid.NewGuid();
 
+        await _mediator.Send(new AddRefreshTokenCommand()
+        {
+            UserId = dto.Id,
+            TokenValue = refreshTokenValue
+        });
+        
         return new TokenResponse()
         {
             AccessToken = accessToken,
             Role = dto.RoleName,
             TokenExpiration = jwtToken.ValidTo,
-            UserId = dto.Id
+            UserId = dto.Id,
+            RefreshToken = refreshTokenValue
         };
+    }
+
+    public async Task RemoveRefreshTokenAsync(Guid requestRefreshToken)
+    {
+        await _mediator.Send(new RemoveRefreshTokenCommand()
+        {
+            TokenValue = requestRefreshToken
+        });
     }
 }

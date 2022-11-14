@@ -98,6 +98,20 @@
             <param name="request"></param>
             <returns></returns>
         </member>
+        <member name="M:AspNetSample.WebAPI.Controllers.TokenController.RefreshToken(AspNetSample.WebAPI.Models.Requests.RefreshTokenRequestModel)">
+            <summary>
+            Register user
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AspNetSample.WebAPI.Controllers.TokenController.RevokeToken(AspNetSample.WebAPI.Models.Requests.RefreshTokenRequestModel)">
+            <summary>
+            Register user
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
         <member name="M:AspNetSample.WebAPI.Controllers.UserController.Create(AspNetSample.WebAPI.Models.Requests.RegisterUserRequestModel)">
             <summary>
             Register user

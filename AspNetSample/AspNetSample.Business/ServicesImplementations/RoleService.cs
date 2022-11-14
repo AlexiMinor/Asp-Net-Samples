@@ -24,8 +24,10 @@ public class RoleService : IRoleService
 
     public async Task<Guid?> GetRoleIdByNameAsync(string name)
     {
-        var role = await _unitOfWork.Roles.FindBy(role1 => role1.Name.Equals(name))
+        var role = await _unitOfWork.Roles
+            .FindBy(role1 => role1.Name.Equals(name))
             .FirstOrDefaultAsync();
+
         return role?.Id;
     }
 }

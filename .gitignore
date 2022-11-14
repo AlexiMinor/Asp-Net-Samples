@@ -46,3 +46,9 @@ AspNetSample/AspNetSample.WebAPI/bin/
 AspNetSample/AspNetSample.WebAPI/obj/
 /AspNetSample/AspNetSample.Data.CQS/bin/Debug/net6.0
 /AspNetSample/AspNetSample.Data.CQS/obj
+
+AspNetSample/AspNetSample.Business.Tests/bin/
+
+AspNetSample/AspNetSample.Business.Tests/obj/
+
+AspNetSample/WebApplication2/obj/
