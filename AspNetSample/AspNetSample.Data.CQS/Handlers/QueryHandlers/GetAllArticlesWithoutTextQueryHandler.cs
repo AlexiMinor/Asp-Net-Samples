@@ -1,11 +1,11 @@
 ﻿using AspBetSample.DataBase;
 using AspNetSample.Core.DataTransferObjects;
-using AspNetSample.Data.CQS.Handlers.QueryHandlers;
+using AspNetSample.Data.CQS.Queries;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace AspNetSample.Data.CQS.Queries;
+namespace AspNetSample.Data.CQS.Handlers.QueryHandlers;
 
 public class GetAllArticlesWithoutTextQueryHandler : IRequestHandler<GetAllArticlesWithoutTextIdsQuery, Guid[]?>
 {
@@ -18,7 +18,7 @@ public class GetAllArticlesWithoutTextQueryHandler : IRequestHandler<GetAllArtic
         _mapper = mapper;
     }
 
-    public async Task<Guid[]?> Handle(GetAllArticlesWithoutTextIdsQuery request, 
+    public async Task<Guid[]?> Handle(GetAllArticlesWithoutTextIdsQuery request,
         CancellationToken cancellationToken)
     {
         var articlesWithEmptyTextIds = await _context.Articles.AsNoTracking()

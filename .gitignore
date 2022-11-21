@@ -52,3 +52,9 @@ AspNetSample/AspNetSample.Business.Tests/bin/
 AspNetSample/AspNetSample.Business.Tests/obj/
 
 AspNetSample/WebApplication2/obj/
+
+AspNetSample/AspNetSample.Data.CQS.Tests/bin/
+
+AspNetSample/AspNetSample.Data.CQS.Tests/obj/
+
+angular-samples/good-news-aggregator/.vscode/

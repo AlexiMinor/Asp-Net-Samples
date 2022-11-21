@@ -1,11 +1,11 @@
 ﻿using AspBetSample.DataBase;
 using AspNetSample.Core.DataTransferObjects;
-using AspNetSample.Data.CQS.Handlers.QueryHandlers;
+using AspNetSample.Data.CQS.Queries;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace AspNetSample.Data.CQS.Queries;
+namespace AspNetSample.Data.CQS.Handlers.QueryHandlers;
 
 public class GetUserByRefreshTokenQueryHandler : IRequestHandler<GetUserByRefreshTokenQuery, UserDto?>
 {
@@ -18,7 +18,7 @@ public class GetUserByRefreshTokenQueryHandler : IRequestHandler<GetUserByRefres
         _mapper = mapper;
     }
 
-    public async Task<UserDto?> Handle(GetUserByRefreshTokenQuery request, 
+    public async Task<UserDto?> Handle(GetUserByRefreshTokenQuery request,
         CancellationToken cancellationToken)
     {
         var user = (await _context.RefreshTokens
@@ -27,7 +27,7 @@ public class GetUserByRefreshTokenQueryHandler : IRequestHandler<GetUserByRefres
             .AsNoTracking()
             .FirstOrDefaultAsync(token => token.Token.Equals(request.RefreshToken),
                 cancellationToken))?.User;
-        
+
         return _mapper.Map<UserDto>(user);
     }
 }

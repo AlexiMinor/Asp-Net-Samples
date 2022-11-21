@@ -11,6 +11,7 @@ using AspNetSample.Core.DataTransferObjects;
 using AspNetSample.Data.Abstractions;
 using AspNetSample.Data.CQS.Commands;
 using AspNetSample.Data.CQS.Handlers.QueryHandlers;
+using AspNetSample.Data.CQS.Queries;
 using AutoMapper;
 using HtmlAgilityPack;
 using MediatR;
@@ -26,16 +27,17 @@ public class ArticleService : IArticleService
     private readonly IConfiguration _configuration;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMediator _mediator;
-
+    private readonly HtmlWeb _htmlWeb;
     public ArticleService(IMapper mapper, 
         IConfiguration configuration, 
         IUnitOfWork unitOfWork, 
-        IMediator mediator)
+        IMediator mediator, HtmlWeb htmlWeb)
     {
         _mapper = mapper;
         _configuration = configuration;
         _unitOfWork = unitOfWork;
         _mediator = mediator;
+        _htmlWeb = htmlWeb;
     }
 
 
@@ -98,7 +100,8 @@ public class ArticleService : IArticleService
 
     public async Task<ArticleDto> GetArticleByIdAsync(Guid id)
     {
-        var dto = await _mediator.Send(new GetArticleByIdQuery() { Id = id });
+        var dto = _mapper.Map<ArticleDto>(await _mediator.Send(new GetArticleByIdQuery() { Id = id }));
+
         return dto;
     }
 
@@ -219,11 +222,11 @@ public class ArticleService : IArticleService
         }
     }
 
-    private async Task AddArticleTextToArticleAsync(Guid articleId)
+    public async Task AddArticleTextToArticleAsync(Guid articleId)
     {
         try
         {
-            var article = await _unitOfWork.Articles.GetByIdAsync(articleId);
+            var article = await _mediator.Send(new GetArticleByIdQuery {Id = articleId});
 
             if (article == null)
             {

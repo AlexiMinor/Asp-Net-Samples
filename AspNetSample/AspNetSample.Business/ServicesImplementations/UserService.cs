@@ -3,6 +3,7 @@ using AspNetSample.Core.Abstractions;
 using AspNetSample.Core.DataTransferObjects;
 using AspNetSample.Data.Abstractions;
 using AspNetSample.Data.CQS.Handlers.QueryHandlers;
+using AspNetSample.Data.CQS.Queries;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

@@ -11,6 +11,7 @@ using AspNetSample.Data.Repositories;
 using AspNetSample.WebAPI.Utils;
 using Hangfire;
 using Hangfire.SqlServer;
+using HtmlAgilityPack;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -74,6 +75,7 @@ namespace AspNetSample.WebAPI
             builder.Services.AddScoped<ISourceRepository, SourceRepository>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IJwtUtil, JwtUtilSha256>();
+            builder.Services.AddScoped<HtmlWeb>();
             
             builder.Services.AddMediatR(typeof(AddArticleDataFromRssFeedCommand).Assembly);
 

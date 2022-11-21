@@ -11,21 +11,20 @@ public class UpdateArticleTextCommandHandler
     : IRequestHandler<UpdateArticleTextCommand, Unit>
 {
     private readonly GoodNewsAggregatorContext _context;
-    private readonly IMapper _mapper;
 
-    public UpdateArticleTextCommandHandler(GoodNewsAggregatorContext context, IMapper mapper)
+    public UpdateArticleTextCommandHandler(GoodNewsAggregatorContext context)
     {
         _context = context;
-        _mapper = mapper;
     }
 
-    public async Task<Unit> Handle(UpdateArticleTextCommand command, CancellationToken token)
+    public async Task<Unit> Handle(UpdateArticleTextCommand byIdCommand, CancellationToken token)
     {
+        var x = byIdCommand.Text;
         var article = await _context.Articles
-            .FirstOrDefaultAsync(a => a.Id.Equals(command.Id), token);
+            .FirstOrDefaultAsync(a => a.Id.Equals(byIdCommand.Id), token);
         if (article!=null)
         {
-            article.Text = command.Text;
+            article.Text = byIdCommand.Text;
             await _context.SaveChangesAsync(token);
             return Unit.Value;
         }
