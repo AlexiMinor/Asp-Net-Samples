@@ -25,6 +25,8 @@ namespace AspNetSample.WebAPI
     {
         public static void Main(string[] args)
         {
+            var myCorsPolicyName = "myCors";
+
             var builder = WebApplication.CreateBuilder(args);
             
             builder.Host.UseSerilog((ctx, lc) =>
@@ -35,6 +37,16 @@ namespace AspNetSample.WebAPI
 
             // Add services to the container.
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(myCorsPolicyName, policyBuilder =>
+                {
+                    policyBuilder
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowAnyOrigin();
+                });
+            });
 
             builder.Services.AddControllers();
 
@@ -111,12 +123,14 @@ namespace AspNetSample.WebAPI
             app.UseStaticFiles();
             app.UseHangfireDashboard();
             app.UseRouting();
-
+            
             app.UseHttpsRedirection();
 
             app.UseSwagger();
             app.UseSwaggerUI();
             app.MapHangfireDashboard();
+
+            app.UseCors(myCorsPolicyName);
 
             app.UseAuthentication();
             app.UseAuthorization();

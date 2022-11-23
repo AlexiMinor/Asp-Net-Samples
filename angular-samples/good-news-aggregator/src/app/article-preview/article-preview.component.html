@@ -1,0 +1,7 @@
+<div *ngIf="article">
+  <h3>{{article.title | uppercase}}</h3>
+  <i>{{article.publicationDate}}</i>
+  <p>{{article.shortSummary}}</p>
+
+  <button type="button" (click)="onSelect(article)">Select </button>
+</div>

@@ -1,12 +1,8 @@
 <h2>Articles</h2>
 <div>
-  <ul class="articles">
+  <ul class="articles" *ngIf="articles">
     <li *ngFor="let article of articles" [class.selected]="article === selectedArticle">
-      <h3>{{article.title | uppercase}}</h3>
-      <i>{{article.publicationDate}}</i>
-      <p>{{article.description}}</p>
-
-      <button type="button" (click)="onSelect(article)">Select </button>
+      <app-article-preview [article]="article" (selectedArticleFromPreview)="viewArticle($event)"></app-article-preview>
     </li>
   </ul>
 
@@ -14,14 +10,5 @@
 </div>
 
 <div *ngIf="selectedArticle">
-  <h3>{{selectedArticle.title}}</h3>
-  <h5>{{selectedArticle.id}}</h5>
-  <i>{{selectedArticle.publicationDate}}</i>
-  <p>{{selectedArticle.text}}</p>
-  <h6>{{selectedArticle.rate}}</h6>
-
-
-  <label for="title">Article Title:</label>
-  <input type="text" id="title" [(ngModel)]="selectedArticle.title" placeholder="Title">
-
+  <app-article-details [article]="selectedArticle"></app-article-details>
 </div>
