@@ -4,7 +4,9 @@ using AspNetSample.Business.ServicesImplementations;
 using AspNetSample.Core.Abstractions;
 using AspNetSample.Data.Abstractions;
 using AspNetSample.Data.Abstractions.Repositories;
+using AspNetSample.Data.CQS.Commands;
 using AspNetSample.Data.Repositories;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.EntityFrameworkCore;
@@ -67,8 +69,9 @@ namespace AspNetSampleMvcApp
 
             builder.Configuration.AddJsonFile("secrets.json");
             //builder.Configuration.AddTextFile("somepath");
+            builder.Services.AddMediatR(typeof(AddArticleDataFromRssFeedCommand).Assembly);
 
-            
+
             var app = builder.Build();
 
 

@@ -1,14 +1,13 @@
-<h2>Articles</h2>
-<div>
-  <ul class="articles" *ngIf="articles">
-    <li *ngFor="let article of articles" [class.selected]="article === selectedArticle">
-      <app-article-preview [article]="article" (selectedArticleFromPreview)="viewArticle($event)"></app-article-preview>
-    </li>
-  </ul>
-
-
-</div>
-
-<div *ngIf="selectedArticle">
-  <app-article-details [article]="selectedArticle"></app-article-details>
+<div class="content">
+  <h2>Articles</h2>
+  <div>
+    <ul class="articles" *ngIf="articles">
+      <li
+        *ngFor="let article of articles"
+        [class.selected]="article === selectedArticle"
+      >
+        <app-article-preview [article]="article"></app-article-preview>
+      </li>
+    </ul>
+  </div>
 </div>

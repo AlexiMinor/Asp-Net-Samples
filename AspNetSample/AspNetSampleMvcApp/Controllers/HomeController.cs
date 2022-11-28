@@ -26,8 +26,6 @@ namespace AspNetSampleMvcApp.Controllers
         [HappyExceptionFilter("You'll read privacy policy in future.")]
         public IActionResult Privacy()
         {
-            var x = 0;
-            var z = 15 / x;
             return View();
         }
 

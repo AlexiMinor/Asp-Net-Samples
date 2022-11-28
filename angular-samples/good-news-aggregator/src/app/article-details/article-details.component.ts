@@ -1,5 +1,9 @@
-import { Component, Input } from '@angular/core';
+import { ArticleService } from './../services/article/article.service';
+import { Component, Input, OnInit } from '@angular/core';
 import { Article } from '../models/article';
+import { ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
+
 
 @Component({
   selector: 'app-article-details',
@@ -7,8 +11,20 @@ import { Article } from '../models/article';
   styleUrls: ['./article-details.component.scss']
 })
 
-export class ArticleDetailsComponent {
-  @Input() article?: Article;
+export class ArticleDetailsComponent implements OnInit  {
+  article: Article | undefined;
 
+  constructor(private articleService: ArticleService,
+    private route: ActivatedRoute,
+    private location: Location) { }
 
+  ngOnInit(): void {
+    const id  = this.route.snapshot.paramMap.get('id') || '';
+    this.articleService.getArticleByIdFromApi(id)
+      .subscribe(article => this.article = article);
+  }
+
+  goBack(): void {
+    this.location.back();
+  }
 }

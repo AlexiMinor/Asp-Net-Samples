@@ -54,15 +54,23 @@ namespace AspNetSample.WebAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetArticles([FromQuery] GetArticlesRequestModel? model)
         {
-            IEnumerable<ArticleDto> articles = await _articleService
-                .GetArticlesByNameAndSourcesAsync(model?.Name, model?.SourceId);
+            if (model!= null)
+            {
+                if (model.PageSize == 0)
+                {
+                    model.PageSize = 5;
+                }
+                var articles = await _articleService
+                    .GetArticlesByNameAndSourcesAsync(model?.Name, model?.SourceId, model.PageSize, model.PageNumber);
 
-            var jobId = BackgroundJob.Enqueue(() => Console.WriteLine(HttpContext.Request.Method));
-            var jobId2 = BackgroundJob.Schedule(() => Console.WriteLine(HttpContext.Request.Method), 
-                TimeSpan.FromMinutes(1));
+                //var jobId = BackgroundJob.Enqueue(() => Console.WriteLine(HttpContext.Request.Method));
+                //var jobId2 = BackgroundJob.Schedule(() => Console.WriteLine(HttpContext.Request.Method), 
+                //    TimeSpan.FromMinutes(1));
 
 
-            return Ok(articles.ToList());
+                return Ok(articles.ToList());
+            }
+            return BadRequest();
         }
 
 

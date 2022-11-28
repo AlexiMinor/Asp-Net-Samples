@@ -3,5 +3,5 @@
   <i>{{article.publicationDate}}</i>
   <p>{{article.shortSummary}}</p>
 
-  <button type="button" (click)="onSelect(article)">Select </button>
+  <a class="detail-button" routerLink="/articles/{{article.id}}">Details</a>
 </div>

@@ -9,7 +9,7 @@ public interface IArticleService
 
     Task AggregateArticlesFromExternalSourcesAsync();
     
-    Task<List<ArticleDto>> GetArticlesByNameAndSourcesAsync(string? name, Guid? category);
+    //Task<List<ArticleDto>> GetArticlesByNameAndSourcesAsync(string? name, Guid? category);
 
     Task<ArticleDto> GetArticleByIdAsync(Guid id);
 
@@ -24,4 +24,9 @@ public interface IArticleService
     Task DeleteArticleAsync(Guid id);
 
     Task AddRateToArticlesAsync();
+
+    Task<IEnumerable<ArticleDto>> GetArticlesByNameAndSourcesAsync(string? modelName, 
+        Guid? modelSourceId, 
+        int pageSize,
+        int pageNumber);
 }

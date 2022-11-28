@@ -1,7 +1,5 @@
-﻿using System.Net.Http.Headers;
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 using System.ServiceModel.Syndication;
-using System.Text;
 using System.Xml;
 using AspBetSample.DataBase.Entities;
 using AspNetSample.Business.Models;
@@ -10,7 +8,6 @@ using AspNetSample.Core.Abstractions;
 using AspNetSample.Core.DataTransferObjects;
 using AspNetSample.Data.Abstractions;
 using AspNetSample.Data.CQS.Commands;
-using AspNetSample.Data.CQS.Handlers.QueryHandlers;
 using AspNetSample.Data.CQS.Queries;
 using AutoMapper;
 using HtmlAgilityPack;
@@ -27,17 +24,16 @@ public class ArticleService : IArticleService
     private readonly IConfiguration _configuration;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMediator _mediator;
-    private readonly HtmlWeb _htmlWeb;
-    public ArticleService(IMapper mapper, 
-        IConfiguration configuration, 
-        IUnitOfWork unitOfWork, 
-        IMediator mediator, HtmlWeb htmlWeb)
+
+    public ArticleService(IMapper mapper,
+        IConfiguration configuration,
+        IUnitOfWork unitOfWork,
+        IMediator mediator)
     {
         _mapper = mapper;
         _configuration = configuration;
         _unitOfWork = unitOfWork;
         _mediator = mediator;
-        _htmlWeb = htmlWeb;
     }
 
 
@@ -62,13 +58,13 @@ public class ArticleService : IArticleService
             //todo add logger here
             throw;
         }
-       
+
     }
 
     public async Task AggregateArticlesFromExternalSourcesAsync()
     {
         var sources = await _unitOfWork.Sources.GetAllAsync();
-        
+
         foreach (var source in sources)
         {
             await GetAllArticleDataFromRssAsync(source.Id, source.RssUrl);
@@ -76,7 +72,10 @@ public class ArticleService : IArticleService
         }
     }
 
-    public async Task<List<ArticleDto>> GetArticlesByNameAndSourcesAsync(string? name, Guid? sourceId)
+    public async Task<IEnumerable<ArticleDto>> GetArticlesByNameAndSourcesAsync(string? name,
+        Guid? sourceId,
+        int pageSize = 5,
+        int pageNumber = 0)
     {
         var list = new List<ArticleDto>();
 
@@ -87,14 +86,19 @@ public class ArticleService : IArticleService
             entities = entities.Where(dto => dto.Title.Contains(name));
         }
 
-        if (sourceId!=null && !Guid.Empty.Equals(sourceId))
+        if (sourceId != null && !Guid.Empty.Equals(sourceId))
         {
             entities = entities.Where(dto => dto.SourceId.Equals(sourceId));
         }
 
-        var result = (await entities.ToListAsync())
+        var smth = entities.ToList();
+
+        var result = (await entities
+                .Skip(pageSize * pageNumber)
+                .Take(pageSize)
+                .ToListAsync())
             .Select(ent => _mapper.Map<ArticleDto>(ent))
-            .ToList();
+            .ToArray();
         return result;
     }
 
@@ -109,7 +113,7 @@ public class ArticleService : IArticleService
     {
         var entity = _mapper.Map<Article>(dto);
 
-        if (entity!= null)
+        if (entity != null)
         {
             await _unitOfWork.Articles.AddAsync(entity);
             var addingResult = await _unitOfWork.Commit();
@@ -149,7 +153,7 @@ public class ArticleService : IArticleService
 
         Parallel.ForEach(sources, (source) => GetAllArticleDataFromRssAsync(source.Id, source.RssUrl).Wait());
     }
- 
+
     public async Task AddArticleTextToArticlesAsync()
     {
         var articlesWithEmptyTextIds = await _mediator
@@ -162,7 +166,7 @@ public class ArticleService : IArticleService
                 await AddArticleTextToArticleAsync(articleId);
             }
         }
-     
+
     }
 
     public async Task AddRateToArticlesAsync()
@@ -218,7 +222,7 @@ public class ArticleService : IArticleService
             }
 
             await _mediator.Send(new AddArticleDataFromRssFeedCommand()
-                { Articles = list });
+            { Articles = list });
         }
     }
 
@@ -226,7 +230,7 @@ public class ArticleService : IArticleService
     {
         try
         {
-            var article = await _mediator.Send(new GetArticleByIdQuery {Id = articleId});
+            var article = await _mediator.Send(new GetArticleByIdQuery { Id = articleId });
 
             if (article == null)
             {
@@ -281,11 +285,11 @@ public class ArticleService : IArticleService
 
             using (var client = new HttpClient())
             {
-                var httpRequest = new HttpRequestMessage(HttpMethod.Post, 
+                var httpRequest = new HttpRequestMessage(HttpMethod.Post,
                     new Uri(@"https://api.ispras.ru/texterra/v1/nlp?targetType=lemma&apikey=YOUR_KEY"));
                 httpRequest.Headers.Add("Accept", "application/json");
 
-                httpRequest.Content = JsonContent.Create(new[] {new TextRequestModel() { Text = article.Text}});
+                httpRequest.Content = JsonContent.Create(new[] { new TextRequestModel() { Text = article.Text } });
 
                 var response = await client.SendAsync(httpRequest);
                 var responseStr = await response.Content.ReadAsStreamAsync();

@@ -45,4 +45,15 @@ export class ArticleService {
   getAllArticlesFromApi(): Observable<Article[]>{
     return this.apiService.get('Articles', {}).pipe();
   }
+
+  getArticleByIdFromApi(id:string): Observable<Article>{
+    return this.apiService.get(`Articles/${id}`, {}).pipe();
+  }
+
+  getOnlinerArticlesFromApi(): Observable<Article[]>{
+    return this.apiService.get('Articles', {
+      sourceId: "02cff32a-097a-48b4-8240-f27f81e8a0c1",
+      pageSize:5,
+      pageNumber:0}).pipe();
+  }
 }

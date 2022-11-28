@@ -27,7 +27,7 @@ namespace AspNetSample.Business.Tests
             var articleService = new ArticleService(_mapperMock.Object,
                 _configurationMock.Object,
                 _uowMock.Object,
-                _mediatorMock.Object, _htmlWebMock.Object);
+                _mediatorMock.Object);
 
             return articleService;
         }

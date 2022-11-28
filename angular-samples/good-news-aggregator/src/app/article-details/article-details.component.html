@@ -1,15 +1,16 @@
-<p>article-details works</p>
+<div class="content">
+  <div *ngIf="article">
+    <h3>{{ article.title }}</h3>
+    <h5>{{ article.id }}</h5>
+    <i>{{ article.publicationDate }}</i>
+    <p>{{ article.text }}</p>
+    <h6>{{ article.rate }}</h6>
 
-<div *ngIf="article">
-  <h3>{{article.title}}</h3>
-  <h5>{{article.id}}</h5>
-  <i>{{article.publicationDate}}</i>
-  <p>{{article.text}}</p>
-  <h6>{{article.rate}}</h6>
-
-
-  <!-- <label for="title">Article Title:</label>
+    <!-- <label for="title">Article Title:</label>
   <input type="text" id="title" [(ngModel)]="article.title" placeholder="Title"> -->
-
+  </div>
 </div>
 
+<div >
+  <button (click)="goBack()">Back</button>
+</div>

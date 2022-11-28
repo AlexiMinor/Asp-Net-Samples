@@ -1,0 +1,20 @@
+﻿@model List<CalendarEventModel>
+
+@{
+    ViewData["Title"] = "Calendar with events";
+}
+
+<div id="calendar" style="padding: 1rem;"></div>
+
+
+@section CssStyles {
+    <link rel="stylesheet" href="~/lib/calendar-gc/calendar-gc.css" />
+}
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous">
+        </script>
+    <script src="~/lib/calendar-gc/calendar-gc.js"></script>
+    
+    <script src="~/js/calendar.js"></script>
+}
