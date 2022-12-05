@@ -1,7 +1,16 @@
-<div *ngIf="article">
-  <h3>{{article.title | uppercase}}</h3>
-  <i>{{article.publicationDate}}</i>
-  <p>{{article.shortSummary}}</p>
-
-  <a class="detail-button" routerLink="/articles/{{article.id}}">Details</a>
-</div>
+<mat-card *ngIf="article" [class.mat-elevation-z2]="!isFocused" [class.mat-elevation-z8]="isFocused" (mouseover)="onHover()">
+  <mat-card-header>
+    <mat-card-subtitle>{{article.publicationDate}}</mat-card-subtitle>
+    <mat-card-title>{{article.title | uppercase}}</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div [innerHtml]="article.shortSummary"></div>
+    <mat-divider></mat-divider>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-raised-button routerLink="/articles/{{article.id}}">Details</button>
+  </mat-card-actions>
+  <mat-card-footer>
+  </mat-card-footer>
+</mat-card>
+<br>

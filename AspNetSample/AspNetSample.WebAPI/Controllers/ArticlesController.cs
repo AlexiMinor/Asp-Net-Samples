@@ -4,6 +4,7 @@ using AspNetSample.WebAPI.Models.Requests;
 using AspNetSample.WebAPI.Models.Responses;
 using AutoMapper;
 using Hangfire;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AspNetSample.WebAPI.Controllers
@@ -34,6 +35,7 @@ namespace AspNetSample.WebAPI.Controllers
         /// <param name="id">Id of article</param>
         /// <returns></returns>
         [HttpGet("{id}")]
+        [Authorize]
         [ProducesResponseType(typeof(ArticleDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Nullable), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetArticleById(Guid id)

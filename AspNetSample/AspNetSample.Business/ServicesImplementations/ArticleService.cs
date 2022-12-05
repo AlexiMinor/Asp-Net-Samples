@@ -102,6 +102,17 @@ public class ArticleService : IArticleService
         return result;
     }
 
+    public async Task<int> GetNumberAsync(Guid? sourceId, float? minRating)
+    {
+        var query = new GetArticlesNumberQuery
+        {
+            SourceId = sourceId,
+            MinRating = minRating
+        };
+        return await _mediator.Send(query);
+    }
+
+
     public async Task<ArticleDto> GetArticleByIdAsync(Guid id)
     {
         var dto = _mapper.Map<ArticleDto>(await _mediator.Send(new GetArticleByIdQuery() { Id = id }));

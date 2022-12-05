@@ -27,7 +27,7 @@ namespace AspNetSample.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Register user
+        /// Login user
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>

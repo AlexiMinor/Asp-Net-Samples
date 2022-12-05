@@ -3,14 +3,15 @@
     <h3>{{ article.title }}</h3>
     <h5>{{ article.id }}</h5>
     <i>{{ article.publicationDate }}</i>
-    <p>{{ article.text }}</p>
+    <div [innerHtml]="article.text"></div>
     <h6>{{ article.rate }}</h6>
 
     <!-- <label for="title">Article Title:</label>
   <input type="text" id="title" [(ngModel)]="article.title" placeholder="Title"> -->
   </div>
-</div>
-
-<div >
-  <button (click)="goBack()">Back</button>
+  <div class="back-button">
+    <button mat-raised-button (click)="goBack()">
+      <mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="arrow_back"></mat-icon>
+      Back</button>
+  </div>
 </div>

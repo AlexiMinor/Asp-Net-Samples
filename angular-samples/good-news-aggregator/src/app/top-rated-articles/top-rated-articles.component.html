@@ -1,11 +1,13 @@
 <div class="content" role="main">
-    <h1>Articles</h1>
-</div>
+    <h2>Articles</h2>
+    <div [style.display]="showSpinner ? 'flex' : 'none'">
+      <mat-spinner [strokeWidth]="3"></mat-spinner>
+    </div>
 
-<div>
   <ul class="articles" *ngIf="articles">
-    <li *ngFor="let article of articles" [class.selected]="article === selectedArticle">
+    <li *ngFor="let article of articles" >
       <app-article-preview [article]="article" (selectedArticleFromPreview)="viewArticle($event)"></app-article-preview>
     </li>
   </ul>
 </div>
+

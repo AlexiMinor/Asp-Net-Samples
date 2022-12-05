@@ -1,13 +1,21 @@
 <div class="content">
   <h2>Articles</h2>
+  <div [style.display]="showSpinner ? 'flex' : 'none'">
+    <mat-spinner [strokeWidth]="3"></mat-spinner>
+  </div>
   <div>
     <ul class="articles" *ngIf="articles">
-      <li
-        *ngFor="let article of articles"
-        [class.selected]="article === selectedArticle"
-      >
+      <li *ngFor="let article of articles">
         <app-article-preview [article]="article"></app-article-preview>
       </li>
     </ul>
   </div>
 </div>
+
+<!-- <mat-paginator [length]="articlesNumber"
+              [pageSize]="pageSize"
+              [pageIndex]="actualPage"
+              [pageSizeOptions]="[5, 10, 25, 100]"
+              aria-label="Select page"
+              (page)="pageEvent = getServerData($event)">
+</mat-paginator> -->

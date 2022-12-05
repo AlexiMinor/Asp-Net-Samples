@@ -29,4 +29,6 @@ public interface IArticleService
         Guid? modelSourceId, 
         int pageSize,
         int pageNumber);
+
+    Task<int> GetNumberAsync(Guid? sourceId, float? minRating);
 }

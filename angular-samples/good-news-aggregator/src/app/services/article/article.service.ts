@@ -42,8 +42,15 @@ export class ArticleService {
   //   return of(articles);
   // }
 
-  getAllArticlesFromApi(): Observable<Article[]>{
-    return this.apiService.get('Articles', {}).pipe();
+  getArticlesFromApi(pageSize:number, pageIndex:number): Observable<Article[]>{
+    return this.apiService.get('Articles', {
+      pageSize: pageSize,
+      pageNumber: pageIndex
+    }).pipe();
+  }
+
+  getArticlesCountFromApi(): Observable<number>{
+    return this.apiService.get('ArticlesCount', {}).pipe();
   }
 
   getArticleByIdFromApi(id:string): Observable<Article>{
